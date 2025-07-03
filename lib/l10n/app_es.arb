@@ -1,0 +1,17 @@
+{
+  "appTitle": "Aplicación de Facebook",
+  "login": "Iniciar sesión",
+  "register": "Registrarse",
+  "username": "Nombre de usuario",
+  "password": "Contraseña",
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "feed": "Noticias",
+  "chat": "Mensajes",
+  "profile": "Perfil",
+  "friends": "Amigos",
+  "notifications": "Notificaciones",
+  "search": "Buscar",
+  "settings": "Configuración",
+  "language": "Idioma",
+  "logout": "Cerrar sesión"
+} 

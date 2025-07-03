@@ -1,0 +1,168 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Flutter Expert 项目开发规范
+
+> 版本：1.0  
+> 适用范围：flutter_expert 全体开发成员  
+> 最后更新时间：2024-06-10
+
+> 本项目开发需严格遵循以下外部文档和工具规范：
+> - [flutter_tailwind](mdc:https:/github.com/fastcode555/flutter_tailwind)
+> - [flutter_tailwind_guide](mdc:https:/github.com/fastcode555/flutter_tailwind/blob/master/guide.md)
+> - [Json2Dart_Null_Safety](mdc:https:/github.com/fastcode555/Json2Dart_Null_Safety)
+> - 状态管理统一使用 getx
+> 所有开发、样式、模型、状态管理等必须严格按照上述文档和本规范执行，违背规范的代码不予合并。
+
+---
+
+## 1. 代码风格（Code Style）
+- **缩进**：统一使用 2 个空格缩进，禁止使用 Tab。
+- **命名规范**：
+  - 类名、Widget名使用 UpperCamelCase（大驼峰）。
+  - 变量、方法、参数使用 lowerCamelCase（小驼峰）。
+  - 常量使用全大写加下划线（如：MAX_COUNT）。
+- **注释**：
+  - 重要逻辑、复杂算法必须有注释。
+  - 公共方法、类、Widget 必须有 Dart 文档注释（///）。
+  - 每个类必须在声明前添加注释，内容包括：类的作用、创建时间、（可选）作者、（可选）最后修改时间。
+  - 每个方法必须有注释，内容包括：方法用途、参数说明、返回值说明（如有）。
+- **换行与空行**：
+  - 逻辑块之间适当空行，提升可读性。
+  - 每行代码不超过 100 字符。
+- **导包顺序**：
+  - dart 原生包 > 第三方包 > 本地包，三类之间空一行。
+- **遵循规范与框架复用**：
+  - 所有代码必须严格遵守本项目代码规范。
+  - 业务开发、功能实现优先复用项目中已有的框架和工具（如状态管理、网络请求、UI组件等），禁止重复造轮子和引入风格不统一的实现。
+  - 样式开发必须遵循 flutter_tailwind 及 flutter_tailwind_guide 的链式调用、命名、布局等规范，避免常见错误和反模式。
+
+## 2. 目录结构（Project Structure）
+- `lib/` 业务代码主目录，推荐结构：
+  - `lib/main.dart` 入口文件
+  - `lib/src/` 业务模块
+  - `lib/common/` 公共组件、工具类
+  - `lib/generated/` 自动生成代码
+  - 业务代码必须采用模块化组织，每个业务块单独建立文件夹（如 order、user、product 等），每个模块下再细分 model、controllers、widgets 等子目录。
+  - 示例：
+    ```
+    lib/
+      src/
+        order/
+          models/
+            order_model.dart
+          controllers/
+            order_controller.dart
+          widgets/
+            order_card.dart
+        user/
+          models/
+          controllers/
+          widgets/
+      common/
+      generated/
+    ```
+  - 各业务模块下的 models、controllers、widgets 文件夹为必需，其他如 services、utils 可根据实际需要增设。
+- `assets/` 静态资源（图片、字体等）
+- `test/` 单元与集成测试
+- 禁止在 `lib/` 目录下直接堆放无结构的 Dart 文件。
+
+## 3. 依赖管理（Dependency Management）
+- 所有依赖必须写入 `pubspec.yaml`。
+- 优先选择社区活跃、维护良好的三方包。
+- 禁止使用弃用或无维护的包。
+- 依赖升级需全员评审，锁定版本，避免 `any`。
+- 使用 FVM 管理 Flutter 版本，所有命令需加 `fvm flutter` 前缀。
+- 状态管理方案统一使用 getx，禁止混用其他状态管理库。
+- 数据模型转换、json 解析等必须优先参考 Json2Dart_Null_Safety 相关工具和文档。
+
+## 4. 组件开发（Widget Development）
+- 优先编写可复用的 StatelessWidget。
+- 仅在必要时使用 StatefulWidget。
+- 组件命名需表达清晰语义，禁止无意义命名（如：MyWidget1）。
+- 组件参数需有类型声明和文档注释。
+- 禁止在 Widget 构造函数中直接执行耗时操作。
+- UI 组件开发、样式实现必须优先参考 flutter_tailwind 及其官方指南，链式调用顺序、属性命名、布局方式等需与官方文档保持一致。
+
+## 5. 状态管理（State Management）
+- 推荐使用 Provider、Riverpod、Bloc 等主流方案。
+- 状态管理方案需团队统一，禁止混用多种方案。
+- 避免将业务逻辑写在 UI 层。
+
+## 6. 国际化与本地化（i18n/l10n）
+- 必须使用 Flutter 官方国际化方案（如 flutter_localizations）。
+- 文本内容禁止硬编码，统一抽取到多语言资源文件。
+- 新增/修改文案需同步多语言文件。
+
+## 7. 资源管理（Assets）
+- 图片、字体等资源统一放置于 `assets/` 目录，并在 `pubspec.yaml` 注册。
+- 资源命名需表达用途，禁止使用无意义文件名（如：img1.png）。
+- 禁止在代码中直接引用网络图片，除非业务特殊说明。
+- 动画加载必须统一参考 `assets/lottie` 目录下的实现方式，禁止重复引入功能相同的动画库。
+
+## 8. 测试（Testing）
+- 所有业务逻辑必须有单元测试，覆盖率不低于 80%。
+- 重要页面需有 Widget/UI 测试。
+- 测试代码与业务代码同步维护，禁止遗漏。
+- 每次交付前，必须验证 UI 是否符合设计规范，确保无越界、无报错，并验证单元测试功能是否达到目标要求。
+
+## 9. 注释与文档（Documentation）
+- 复杂逻辑、算法必须有详细注释。
+- 公共 API、组件需有 Dart 文档注释。
+- 项目根目录需维护 `README.md`，内容包括项目简介、环境要求、启动方式、目录结构说明等。
+- 每次新增功能或重要修改，开发者必须在项目根目录的 `README.md` 中记录本次变更内容，包括功能描述、开发人、日期、主要变更点等，便于团队后续总结和查阅。
+- 所有业务开发必须严格遵循项目文档（如 API 文档、业务流程文档、设计文档等）中的规则，禁止随意更改或脱离文档实现。
+
+### 注释规范要求
+
+- **类注释**：
+  - 必须在类声明前添加文档注释，内容包括：
+    - 类的作用说明
+    - 创建时间（格式：yyyy-MM-dd）
+    - （可选）作者、最后修改时间
+  - 示例：
+    /// 用户信息模型
+    ///
+    /// 主要用于存储和传递用户相关数据。
+    ///
+    /// 创建时间：2024-06-10
+    /// 作者：张三
+    /// 最后修改时间：2024-06-11
+    class UserModel {
+      // ...
+    }
+
+- **方法注释**：
+  - 每个方法必须有文档注释，内容包括：
+    - 方法用途说明
+    - 参数说明（每个参数都需解释）
+    - 返回值说明（如有）
+  - 示例：
+    /// 计算两个数的和
+    ///
+    /// [a] 第一个加数
+    /// [b] 第二个加数
+    /// 返回两数之和
+    int sum(int a, int b) {
+      return a + b;
+    }
+
+> 注：所有注释均需使用 Dart 官方文档注释格式（///），保持风格统一。
+
+## 10. 性能优化（Performance）
+- 禁止在 build 方法中执行耗时操作。
+- 大量数据渲染需使用懒加载（如 ListView.builder）。
+- 定期使用 Flutter DevTools 进行性能分析。
+
+## 11. 安全与隐私（Security & Privacy）
+- 禁止在代码中硬编码敏感信息（如 API Key、密码等）。
+- 依赖包需定期安全审查。
+- 用户隐私数据需加密存储和传输。
+
+## 12. 代码交付
+- 交付之前需要在命令行运行之后，修复所有报错之后，再提醒用户，如果有问题，需要一直解决问题
+---
+
+如有疑问或建议，请联系项目维护者。

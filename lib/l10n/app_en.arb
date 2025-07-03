@@ -1,0 +1,17 @@
+{
+  "appTitle": "Facebook App",
+  "login": "Login",
+  "register": "Register",
+  "username": "Username",
+  "password": "Password",
+  "forgotPassword": "Forgot password?",
+  "feed": "Feed",
+  "chat": "Messages",
+  "profile": "Profile",
+  "friends": "Friends",
+  "notifications": "Notifications",
+  "search": "Search",
+  "settings": "Settings",
+  "language": "Language",
+  "logout": "Logout"
+} 

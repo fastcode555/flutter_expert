@@ -1,0 +1,468 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Flutter Tailwind 开发规则
+
+## 概述
+
+Flutter Tailwind 是一个受 TailwindCSS 启发的 Flutter UI 库，通过链式调用 API 简化样式描述，提高开发效率。该库采用 Mixin 可组合架构，支持屏幕适配，提供丰富的样式快捷方式。
+
+## 核心架构
+
+### 1. 链式调用设计模式
+
+#### 基本结构
+```dart
+// 基本链式调用模式
+'Hello World'.text.red.f16.bold.mk
+
+// 容器组件
+container.s100.red.rounded8.border2.child(widget)
+
+// 按钮组件
+'Button'.elevatedButton.blue.textWhite.click(onTap: () {})
+```
+
+#### MkBuilder 基类系统
+- `MkBuilder<T>`: 基础构建器，提供 `mk` 方法创建组件
+- `ChildMkBuilder<T>`: 支持子组件的构建器
+- `ChildBuilder<T>`: 单子组件构建器
+- `ChildrenBuilder<T>`: 多子组件构建器
+
+### 2. Mixin 可组合架构
+
+#### 核心 Mixin 类型
+```dart
+// 颜色系统
+ColorBuilder, BorderColorBuilder, TextColorBuilder
+
+// 尺寸系统
+SizeBuilder, FontSizeBuilder, BorderWidthBuilder
+
+// 布局系统
+PaddingBuilder, MarginBuilder, AlignmentBuilder, ExpandedBuilder
+
+// 样式系统
+BorderRadiusBuilder, ShadowBuilder, OpacityBuilder, BlendModeBuilder
+
+// 功能系统
+KeyBuilder, IconBuilder, ImageFeature, TextFeature
+```
+
+## 使用规则
+
+### 1. 初始化配置
+
+#### 必须的初始化步骤
+```dart
+// 在 main.dart 中使用 ScreenUtilInit 包装应用
+ScreenUtilInit(
+  designSize: const Size(375, 812), // 设计稿尺寸
+  minTextAdapt: true,
+  splitScreenMode: true,
+  builder: (context, child) {
+    return MaterialApp(/* 应用配置 */);
+  },
+)
+
+// 在首个页面初始化 Tailwind
+class _MyPageState extends State<MyPage> {
+  @override
+  void initState() {
+    super.initState();
+    // 可选：配置图片加载器
+    Tailwind.instance.addImageConfig(CustomImageConfig());
+    // 可选：配置图片工厂
+    Tailwind.instance.configImageFactory(CustomImageFactory());
+  }
+}
+```
+
+### 2. 组件使用规范
+
+#### 文本组件 (Text)
+```dart
+// 基本用法
+'Hello World'.text.mk
+
+// 链式样式
+'Hello World'.text.red.f16.bold.underline.mk
+
+// 使用预定义样式
+'Hello World'.text.styleMain.mk  // 需在扩展中定义
+
+// 渐变文本
+'Hello World'.text.white.mk
+```
+
+#### 容器组件 (Container)
+```dart
+// 空容器
+container.s100.red.rounded8.mk
+
+// 带子组件的容器
+container.w200.h100.blue.rounded12.center.child(
+  'Content'.text.white.mk
+)
+
+// 复杂样式容器
+container.s100.circle.orangeAccent.borderBrown.cardShadow.border5.mk
+```
+
+#### 按钮组件 (Button)
+```dart
+// ElevatedButton
+'Submit'.elevatedButton.blue.textWhite.click(onTap: () {})
+
+// TextButton
+'Cancel'.textButton.red.click(onTap: () {})
+
+// OutlinedButton
+'Outlined'.outlinedButton.borderBlue.border2.click(onTap: () {})
+
+// IconButton
+Icons.add.iconButton.green.click(onTap: () {})
+```
+
+#### 图标和图片
+```dart
+// 图标
+Icons.home.icon.red.s24.mk
+
+// SVG 图标
+R.icHome.svg.blue.s20.mk
+
+// 资源图片
+R.logoImage.asset.s100.rounded8.mk
+
+// 网络图片
+'https://example.com/image.jpg'.image.s100.circle.mk
+
+// 带边框的图片
+R.avatar.asset.s80.circle.border2.borderWhite.mk
+```
+
+### 3. 样式系统
+
+#### 颜色使用
+```dart
+// 预定义颜色
+.red, .green, .blue, .white, .black
+
+// 色阶颜色
+.red50, .red100, .red200, ..., .red900
+
+// 透明度
+.black87, .black54, .white70
+
+// 强调色
+.redAccent, .greenAccent, .blueAccent
+
+// 主题色
+.primary  // 使用 Tailwind.instance.primary
+```
+
+#### 尺寸系统
+```dart
+// 固定尺寸
+.s16, .s20, .s24, .s50, .s100
+
+// 响应式尺寸 (使用 .r 后缀)
+.w100, .h50, .p16, .m8
+
+// 字体大小
+.f12, .f14, .f16, .f18, .f20, .f24, .f30
+
+// 边框宽度
+.border1, .border2, .border5
+```
+
+#### 圆角系统
+```dart
+// 统一圆角
+.rounded4, .rounded8, .rounded12, .rounded16
+
+// 单边圆角
+.roundedT8, .roundedB8, .roundedL8, .roundedR8
+
+// 完全圆形
+.circle
+
+// 自定义圆角
+.rounded(8.0)
+```
+
+### 4. 布局组件
+
+#### Wrap 布局
+```dart
+wrap.spacing8.runSpacing8.children([
+  widget1,
+  widget2,
+  widget3,
+])
+```
+
+#### Row 和 Column
+```dart
+// Row
+row.mainAxisAlignment(MainAxisAlignment.spaceBetween).children([
+  'Left'.text.mk,
+  'Right'.text.mk,
+])
+
+// Column
+column.crossAxisAlignment(CrossAxisAlignment.start).children([
+  'Title'.text.f18.bold.mk,
+  'Subtitle'.text.f14.grey.mk,
+])
+```
+
+#### SizedBox
+```dart
+// 间距
+h16,  // 高度间距
+w8,   // 宽度间距
+
+// 自定义 SizedBox
+sizedBox.w100.h50.mk
+```
+
+### 5. 表单组件
+
+#### CheckBox
+```dart
+checkBox.blue.borderBlack.onChanged(false, (value) {
+  // 处理选中状态变化
+})
+
+// 圆形 CheckBox
+checkBox.circle.red.onChanged(true, (value) {})
+
+// 自定义图标 CheckBox
+checkBox.blue.icon(Icons.star).onChanged(false, (value) {})
+```
+
+#### Radio
+```dart
+radio.onChanged(0, groupValue, (value) {
+  // 处理选择变化
+})
+
+// 带样式的 Radio
+radio.circle.green.material.onChanged(1, groupValue, (value) {})
+```
+
+#### Input
+```dart
+// 基础输入框
+Input(
+  hintText: 'Enter text',
+  labelText: 'Label',
+)
+
+// 带图标的输入框
+Input(
+  prefixIcon: Icons.person.icon.s20.mk,
+  hintText: 'Username',
+)
+
+// 轮廓输入框
+Input.outline(
+  labelText: 'Email',
+  suffixIcon: Icons.email.icon.mk,
+)
+```
+
+### 6. 扩展开发
+
+#### 创建自定义扩展
+```dart
+// 文件: res/tailwind_ext.dart
+part 'tailwind_ext.g.dart';
+
+/// 自定义尺寸扩展
+extension CustomSizeExt<T extends SizeBuilder> on T {
+  T get s121 => this..size = 121.r;
+  T get customWidth => this..width = 300.w;
+}
+
+/// 自定义字体扩展
+extension CustomFontExt<T extends TextFeature> on T {
+  T get customFont => this..innerFontFamily = 'CustomFont';
+}
+
+/// 自定义图标扩展
+extension CustomIconExt<T extends IconBuilder> on T {
+  T get customIcon => this..icon(CustomIcons.myIcon);
+}
+
+/// 自定义样式扩展
+extension CustomStyleExt<T extends CompletedTextStyleBuilder> on T {
+  T get primaryStyle => this..style = ts.blue.f16.bold.mk;
+  T get secondaryStyle => this..style = ts.grey.f14.mk;
+}
+
+/// 自定义装饰扩展
+extension CustomDecorationExt<T extends CompleteDecoration> on T {
+  T get cardDecoration => this..decoration = bd.white.rounded12.cardShadow.mk;
+}
+```
+
+#### 生成扩展文件
+```bash
+# 运行代码生成命令
+flutter packages pub run build_runner build
+```
+
+### 7. 图片加载配置
+
+#### 自定义图片配置
+```dart
+class AppImageConfig implements ImageLoaderConfigInterface {
+  @override
+  ImageProvider<Object>? getImageProvider(String? url) {
+    if (url == null || url.isEmpty) return null;
+    
+    if (url.startsWith('http')) {
+      return CachedNetworkImageProvider(url);
+    }
+    
+    if (url.startsWith('assets/')) {
+      return AssetImage(url);
+    }
+    
+    return FileImage(File(url));
+  }
+}
+
+// 在应用启动时配置
+Tailwind.instance.addImageConfig(AppImageConfig());
+```
+
+## 最佳实践
+
+### 1. 代码组织
+
+#### 文件结构
+```
+lib/
+  res/
+    colours.dart          # 颜色定义
+    r.dart               # 资源引用
+    tailwind_ext.dart    # 扩展定义
+    tailwind_ext.g.dart  # 生成的扩展
+  widgets/
+    custom_widgets.dart  # 自定义组件
+  pages/
+    home_page.dart       # 页面文件
+```
+
+#### 颜色管理
+```dart
+// colours.dart
+class Colours {
+  static const Color primary = Color(0xFF2196F3);
+  static const Color secondary = Color(0xFF4CAF50);
+  static const Color accent = Color(0xFFFF9800);
+  static const Color background = Color(0xFFF5F5F5);
+}
+```
+
+### 2. 性能优化
+
+#### 避免频繁重建
+```dart
+// 好的做法：缓存复杂的样式
+class MyWidget extends StatelessWidget {
+  static final _titleStyle = ts.blue.f18.bold.mk;
+  static final _subtitleStyle = ts.grey.f14.mk;
+  
+  @override
+  Widget build(BuildContext context) {
+    return column.children([
+      'Title'.text.style = _titleStyle.mk,
+      'Subtitle'.text.style = _subtitleStyle.mk,
+    ]);
+  }
+}
+```
+
+#### 合理使用响应式尺寸
+```dart
+// 使用 .r 单位进行屏幕适配
+container.w300.h200.p16.m8.mk  // 自动适配不同屏幕
+```
+
+### 3. 主题配置
+
+#### 初始化主题
+```dart
+// 在 MaterialApp 创建后初始化
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      builder: (context, child) {
+        // 初始化 Tailwind 主题
+        Tailwind.instance.init(context, Colors.blue);
+        
+        return MaterialApp(/* ... */);
+      },
+    );
+  }
+}
+```
+
+### 4. 调试技巧
+
+#### 组件检查
+```dart
+// 使用 Flutter Inspector 检查生成的组件树
+// 添加 Key 用于调试
+container.key('my-container').red.s100.mk
+```
+
+#### 样式验证
+```dart
+// 验证样式是否正确应用
+debugPrint('Container color: ${container.innerColor}');
+debugPrint('Text size: ${text.fontSize}');
+```
+
+## 常见问题
+
+### 1. 样式不生效
+- 检查是否调用了 `.mk` 方法
+- 确认样式链的顺序是否正确
+- 验证是否正确导入了扩展文件
+
+### 2. 屏幕适配问题
+- 确保使用 `ScreenUtilInit` 包装应用
+- 使用 `.r` 单位进行响应式设计
+- 检查设计稿尺寸配置是否正确
+
+### 3. 扩展不可用
+- 运行 `flutter packages pub run build_runner build`
+- 检查 `part` 和 `part of` 指令
+- 确认扩展文件的导入路径
+
+### 4. 图片加载失败
+- 配置正确的 `ImageLoaderConfig`
+- 检查网络图片的缓存策略
+- 验证资源文件路径
+
+## 版本兼容性
+
+- Flutter SDK: >= 3.0.0
+- Dart: >= 2.17.0
+- 依赖库版本要求参考 `pubspec.yaml`
+
+## 贡献指南
+
+1. 遵循现有的代码风格和架构
+2. 新增功能需要添加相应的测试
+3. 更新文档说明新增的 API
+4. 保持向后兼容性
