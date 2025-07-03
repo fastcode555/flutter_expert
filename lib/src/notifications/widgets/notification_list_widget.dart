@@ -195,10 +195,10 @@ class _NotificationListWidgetState extends State<NotificationListWidget> {
         child: container.white.mb8.cardShadow.child(
           row.children([
             // 左侧指示器（未读状态）
-            container.w4.h80.color(isRead ? Colors.transparent : color).mk,
+            container.color(isRead ? Colors.transparent : color).w4.h80.mk,
             
             // 头像
-            container.s50.circle.color(color.withOpacity(0.1)).ml12.mr12.center.child(
+            container.color(color.withOpacity(0.1)).s50.circle.ml12.mr12.center.child(
               avatar.icon.color(color).s24.mk,
             ),
             

@@ -277,7 +277,7 @@ class _SearchPageWidgetState extends State<SearchPageWidget> {
         row.children([
           icon.icon.color(textColor).s16.mk,
           w8,
-          keyword.text.color(textColor).f14.expanded.mk,
+          keyword.text.color(textColor).f14.maxLine1.ellipsis.start.expanded.mk,
         ]),
       ),
     );

@@ -125,7 +125,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
           w16,
           
           // 选中状态指示器
-          container.s24.circle.color(isSelected ? Colors.blue : Colors.grey.shade300).center.child(
+          container.color(isSelected ? Colors.blue : Colors.grey.shade300).s24.circle.center.child(
             isSelected
                 ? Icons.check.icon.white.s16.mk
                 : SizedBox.shrink(),
@@ -160,7 +160,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
         bgColor = Colors.grey.shade50;
     }
     
-    return container.s50.circle.color(bgColor).center.child(
+    return container.color(bgColor).s50.circle.center.child(
       flag.text.f24.mk,
     );
   }

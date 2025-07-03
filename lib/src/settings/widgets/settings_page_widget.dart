@@ -217,14 +217,10 @@ class _SettingsPageWidgetState extends State<SettingsPageWidget> {
           Expanded(
             child: container.pr16.pv16.child(
               row.spaceBetween.children([
-                column.children([
-                  container.wFull.child(
-                    title.text.black87.f14.bold.mk,
-                  ),
+                column.expanded.crossStart.children([
+                  title.text.black87.f14.bold.maxLine1.ellipsis.start.mk,
                   h4,
-                  container.wFull.child(
-                    subtitle.text.grey.f12.mk,
-                  ),
+                  subtitle.text.grey.f12.maxLine1.ellipsis.start.mk,
                 ]),
                 trailing ?? Icons.chevron_right.icon.grey400.s20.mk,
               ]),

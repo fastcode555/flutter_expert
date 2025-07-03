@@ -106,8 +106,8 @@ class _FriendListWidgetState extends State<FriendListWidget> {
             child: container.pr16.pv16.child(
               column.children([
                 row.spaceBetween.children([
-                  friend['nickname'].toString().text.black87.f14.bold.mk,
-                  container.s8.circle.color(isOnline ? Colors.green : Colors.grey).mk,
+                  friend['nickname'].toString().text.black87.f14.bold.maxLine1.ellipsis.start.expanded.mk,
+                  container.color(isOnline ? Colors.green : Colors.grey).s8.circle.mk,
                 ]),
                 h8,
                 row.spaceBetween.children([

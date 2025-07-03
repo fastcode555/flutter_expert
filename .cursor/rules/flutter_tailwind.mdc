@@ -633,6 +633,34 @@ sizedBox.w200.h100.child(
 )
 // ✅ 优化：Row本身支持尺寸设置
 row.w200.h100.center.children([...])
+
+// 场景8: 手动添加间距组件 ⭐⭐⭐
+// ❌ 冗余：手动插入间距组件
+column.children([
+  _buildHeaderSection(),
+  h20,  // 手动间距
+  _buildContentSection(),
+  h20,  // 手动间距
+  _buildFooterSection(),
+])
+
+row.children([
+  _buildLeftPanel(),
+  w16,  // 手动间距
+  _buildRightPanel(),
+])
+
+// ✅ 优化：使用spacing属性统一间距
+column.spacing(20).children([
+  _buildHeaderSection(),
+  _buildContentSection(),
+  _buildFooterSection(),
+])
+
+row.spacing(16).children([
+  _buildLeftPanel(),
+  _buildRightPanel(),
+])
 ```
 
 #### 保留必要层级的情况
@@ -660,7 +688,59 @@ row.spaceBetween.children([
 ])
 ```
 
-### 3. 性能优化
+### 3. 间距优化 ⭐
+
+#### 使用 spacing 属性替代手动间距组件
+Row 和 Column 的 `spacing` 属性是一个重要的优化特性，可以显著简化代码并提升性能：
+
+```dart
+// ❌ 错误做法：手动添加间距组件
+column.children([
+  _buildNicknameField(),
+  h20,  // 手动间距组件
+  _buildBioField(),
+  h20,  // 手动间距组件
+  _buildGenderField(),
+  h20,  // 手动间距组件
+  _buildBirthdayField(),
+])
+
+// ✅ 正确做法：使用 spacing 属性
+column.spacing(20).children([
+  _buildNicknameField(),
+  _buildBioField(),
+  _buildGenderField(),
+  _buildBirthdayField(),
+])
+
+// Row 的 spacing 使用示例
+row.spacing(16).children([
+  'First'.text.mk,
+  'Second'.text.mk,
+  'Third'.text.mk,
+])
+```
+
+#### spacing 属性的优势
+1. **代码简洁**：消除冗余的间距组件（h20, w16 等）
+2. **性能提升**：减少 Widget 数量，降低渲染开销
+3. **维护性好**：统一间距设置，易于修改
+4. **视觉清晰**：减少代码噪音，提高可读性
+
+#### 常用 spacing 值
+```dart
+column.spacing(8).children([...])   // 小间距
+column.spacing(16).children([...])  // 标准间距
+column.spacing(24).children([...])  // 大间距
+column.spacing(32).children([...])  // 特大间距
+
+// 也可以使用预定义的spacing
+column.spacing8.children([...])
+column.spacing16.children([...])
+column.spacing24.children([...])
+```
+
+### 4. 性能优化
 
 #### 避免频繁重建
 ```dart
@@ -1006,7 +1086,60 @@ debugPrint('Text size: ${text.fontSize}');
   )
   ```
 
-### 7. Expanded 布局问题
+### 7. spacing 间距使用问题 ⭐⭐⭐
+- **手动间距组件冗余**: 发现代码中有大量 h20、w16 等手动间距
+  ```dart
+  // ❌ 问题代码：手动插入间距组件
+  column.children([
+    _buildHeaderSection(),
+    h20,  // 冗余间距组件
+    _buildContentSection(),
+    h20,  // 冗余间距组件
+    _buildFooterSection(),
+  ])
+
+  // ✅ 解决方案：使用 spacing 属性
+  column.spacing(20).children([
+    _buildHeaderSection(),
+    _buildContentSection(),
+    _buildFooterSection(),
+  ])
+  ```
+
+- **间距不统一**: 不同地方使用不同的间距值
+  ```dart
+  // ❌ 问题：间距值不统一
+  column.children([
+    widget1,
+    h16,  // 16像素间距
+    widget2,
+    h20,  // 20像素间距，不一致
+    widget3,
+  ])
+
+  // ✅ 解决方案：统一间距
+  column.spacing(16).children([  // 或 spacing(20)，保持一致
+    widget1,
+    widget2,
+    widget3,
+  ])
+  ```
+
+- **性能问题**: 列表中有过多的间距组件影响性能
+  ```dart
+  // ❌ 性能差：大量间距组件
+  column.children(List.generate(100, (index) => [
+    buildListItem(index),
+    if (index < 99) h12,  // 99个额外的Widget
+  ]).expand((x) => x).toList())
+
+  // ✅ 性能好：使用 spacing
+  column.spacing(12).children(
+    List.generate(100, (index) => buildListItem(index))
+  )
+  ```
+
+### 8. Expanded 布局问题
 - **组件不显示或布局异常**: 确保 expanded 在正确的父容器中使用
   ```dart
   // ❌ 错误：在非线性布局中使用
@@ -1180,6 +1313,7 @@ debugPrint('Text size: ${text.fontSize}');
 | **空布局容器** | Row/Column为空或只有间距 | 使用SizedBox代替 | `column.children([h16])` → `h16` |
 | **Row/Column外包装** | Container包装Row/Column设置属性 | 直接在Row/Column上设置 | `container.p16.red.child(row.children([...]))` → `row.p16.red.children([...])` |
 | **尺寸外包装** | SizedBox包装Row/Column设置尺寸 | 直接在Row/Column上设置 | `sizedBox.w200.child(column.children([...]))` → `column.w200.children([...])` |
+| **手动间距组件** ⭐ | 子组件间手动插入h/w间距 | 使用spacing属性统一间距 | `column.children([a, h20, b])` → `column.spacing(20).children([a, b])` |
 
 ## 贡献指南
 
@@ -1207,3 +1341,10 @@ debugPrint('Text size: ${text.fontSize}');
    - **检查Container必要性**：如果Container只是为了设置Row/Column支持的属性，则删除Container
    - **SizedBox包装检查**：Row/Column本身支持尺寸设置，避免SizedBox包装
    - **教育团队**：确保团队成员了解Row/Column的完整属性支持能力
+10. **spacing 属性优先使用规范** ⭐⭐⭐：
+    - **强制使用spacing**：Row/Column 的子组件间距必须优先使用 spacing 属性
+    - **禁止手动间距**：严格禁止在 Row/Column 中手动插入 h20、w16 等间距组件
+    - **统一间距管理**：所有子组件间距通过 spacing(value) 统一设置
+    - **性能考量**：spacing 属性减少 Widget 数量，提升渲染性能
+    - **代码评审重点**：Code Review 必须检查是否正确使用 spacing 属性
+    - **重构建议**：发现手动间距组件时，立即重构为 spacing 属性

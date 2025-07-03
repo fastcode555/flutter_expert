@@ -92,7 +92,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
         ),
         title: '编辑资料'.text.black.f18.bold.mk,
         actions: [
-          container.pr16.child(
+          padding.pr16.child(
             GestureDetector(
               onTap: _saveProfile,
               child: '保存'.text.blue.f16.mk,
@@ -139,7 +139,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
     return container.white.ph16.pv20.child(
       column.children([
         // 封面图片
-        container.h120.wFull.rounded8.blue100.mb16.child(
+        container.blue100.h120.wFull.rounded8.mb16.child(
           stack.children([
             // 封面背景
             container.wFull.hFull.rounded8.center.child(
@@ -163,7 +163,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
         row.center.children([
           stack.children([
             // 头像
-            container.s80.circle.grey200.center.child(
+            container.grey200.s80.circle.center.child(
               Icons.person.icon.grey600.s40.mk,
             ),
             // 编辑按钮
@@ -188,9 +188,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
   /// 构建昵称输入字段
   Widget _buildNicknameField() {
     return column.children([
-      container.wFull.child(
-        '昵称'.text.black87.f16.bold.mk,
-      ),
+      '昵称'.text.black87.f16.bold.mk,
       h8,
       container.wFull.border1.borderGrey300.rounded8.p12.child(
         TextField(
@@ -209,9 +207,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
   /// 构建简介输入字段
   Widget _buildBioField() {
     return column.children([
-      container.wFull.child(
-        '简介'.text.black87.f16.bold.mk,
-      ),
+      '简介'.text.black87.f16.bold.mk,
       h8,
       container.wFull.h80.border1.borderGrey300.rounded8.p12.child(
         TextField(
@@ -231,9 +227,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
   /// 构建性别选择字段
   Widget _buildGenderField() {
     return column.children([
-      container.wFull.child(
-        '性别'.text.black87.f16.bold.mk,
-      ),
+      '性别'.text.black87.f16.bold.mk,
       h8,
       container.wFull.border1.borderGrey300.rounded8.p12.child(
         DropdownButtonHideUnderline(
@@ -262,9 +256,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
   /// 构建生日选择字段
   Widget _buildBirthdayField() {
     return column.children([
-      container.wFull.child(
-        '生日'.text.black87.f16.bold.mk,
-      ),
+      '生日'.text.black87.f16.bold.mk,
       h8,
       GestureDetector(
         onTap: _selectBirthday,

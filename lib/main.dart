@@ -245,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
       },
       child: container.white.rounded12.cardShadow.child(
         column.center.children([
-          container.s50.circle.color(color.withOpacity(0.1)).center.child(
+          container.color(color.withOpacity(0.1)).s50.circle.center.child(
             icon.icon.color(color).s24.mk,
           ),
           h12,

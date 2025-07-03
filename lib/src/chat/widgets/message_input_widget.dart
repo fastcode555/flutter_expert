@@ -119,7 +119,7 @@ class _MessageInputWidgetState extends State<MessageInputWidget> {
         );
       },
       child: column.center.children([
-        container.s50.circle.color(color.withOpacity(0.1)).center.child(
+        container.color(color.withOpacity(0.1)).s50.circle.center.child(
           icon.icon.color(color).s24.mk,
         ),
         h8,

@@ -221,8 +221,8 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
           column.crossStart.expanded.children([
             row.spaceBetween.children([
               // 标题和类型标签
-              row.children([
-                result['name'].toString().text.black.f16.bold.mk,
+              row.expanded.children([
+                result['name'].toString().text.black.f16.bold.maxLine1.ellipsis.start.mk,
                 w8,
                 _buildTypeTag(type),
               ]),
@@ -264,7 +264,7 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
         bgColor = Colors.grey;
     }
     
-    return container.s50.circle.color(bgColor.withOpacity(0.1)).center.child(
+    return container.color(bgColor.withOpacity(0.1)).s50.circle.center.child(
       iconData.icon.color(bgColor).s24.mk,
     );
   }
