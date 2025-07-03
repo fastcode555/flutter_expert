@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
 import '../../i18n/controllers/locale_controller.dart';
 import '../../i18n/models/locale_model.dart';
@@ -6,48 +7,177 @@ import '../../i18n/models/locale_model.dart';
 /// 语言选择页面组件
 ///
 /// 用于切换应用语言。
+/// 使用 flutter_tailwind 链式调用 API 实现现代化的 UI 设计。
 ///
 /// 创建时间：2024-06-10
 /// 作者：AI助手
-/// 最后修改时间：2024-06-10
-class LanguageSelectWidget extends StatelessWidget {
+/// 最后修改时间：2024-12-19
+class LanguageSelectWidget extends StatefulWidget {
   const LanguageSelectWidget({Key? key}) : super(key: key);
 
   @override
+  State<LanguageSelectWidget> createState() => _LanguageSelectWidgetState();
+}
+
+class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
+  /// 支持的语言列表
+  final List<LocaleModel> languages = [
+    LocaleModel(languageCode: 'zh', countryCode: 'CN', name: '简体中文'),
+    LocaleModel(languageCode: 'en', countryCode: 'US', name: 'English'),
+    LocaleModel(languageCode: 'es', countryCode: 'ES', name: 'Español'),
+  ];
+
+  /// 切换语言
+  ///
+  /// [locale] 目标语言配置
+  void _changeLanguage(LocaleModel locale) {
+    final LocaleController controller = Get.find<LocaleController>();
+    controller.changeLocale(locale);
+    
+    Get.snackbar(
+      '提示',
+      '语言已切换为：${locale.name}',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
+    
+    // 延迟一秒后返回
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        Get.back();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    /// 支持的语言列表
-    final List<LocaleModel> languages = [
-      LocaleModel(languageCode: 'zh', countryCode: 'CN', name: '简体中文'),
-      LocaleModel(languageCode: 'en', countryCode: 'US', name: 'English'),
-      LocaleModel(languageCode: 'es', countryCode: 'ES', name: 'Español'),
-    ];
     // 使用GetX监听当前语言
     return GetBuilder<LocaleController>(
       init: LocaleController(),
       builder: (controller) {
         final String currentLang = controller.currentLocale.value.languageCode;
+        
         return Scaffold(
+          // 应用栏配置
           appBar: AppBar(
-            title: const Text('选择语言'),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: GestureDetector(
+              onTap: () => Get.back(),
+              child: Icons.arrow_back_ios.icon.black.s20.mk,
+            ),
+            title: '选择语言'.text.black.f18.bold.mk,
           ),
-          body: ListView(
-            children: languages.map((lang) {
-              return RadioListTile<String>(
-                value: lang.languageCode,
-                groupValue: currentLang,
-                title: Text(lang.name),
-                onChanged: (value) {
-                  /// 切换语言
-                  /// [value] 选中的语言代码
-                  if (value != null && value != currentLang) {
-                    controller.changeLocale(lang);
-                  }
-                },
-              );
-            }).toList(),
-          ),
+          backgroundColor: const Color(0xFFF8F9FA),
+          
+          // 主体内容
+          body: column.children([
+            h16,
+            
+            // 语言列表
+            listview.shrinkWrap.neverScroll.separated8.ph16.dataBuilder<LocaleModel>(
+              languages,
+              (context, index, language) => _buildLanguageItem(language, currentLang),
+            ),
+            
+            h24,
+            
+            // 说明文字
+            container.white.p16.child(
+              column.children([
+                '语言说明'.text.black.f16.bold.mk,
+                h8,
+                '• 切换语言后将立即生效'.text.grey600.f14.mk,
+                h4,
+                '• 支持的语言包括简体中文、英语和西班牙语'.text.grey600.f14.mk,
+                h4,
+                '• 部分页面可能需要重新进入才能完全生效'.text.grey600.f14.mk,
+              ]),
+            ),
+          ]),
         );
       },
     );
+  }
+
+  /// 构建语言选项
+  ///
+  /// [language] 语言配置
+  /// [currentLang] 当前选中的语言代码
+  Widget _buildLanguageItem(LocaleModel language, String currentLang) {
+    final bool isSelected = language.languageCode == currentLang;
+    
+    return GestureDetector(
+      onTap: () => _changeLanguage(language),
+      child: container.white.rounded12.cardShadow.child(
+        row.children([
+          // 语言图标
+          _buildLanguageIcon(language.languageCode),
+          w16,
+          
+          // 语言名称
+          column.crossStart.expanded.children([
+            language.name.text.black.f16.bold.mk,
+            h4,
+            _getLanguageDescription(language.languageCode).text.grey600.f14.mk,
+          ]),
+          w16,
+          
+          // 选中状态指示器
+          container.s24.circle.color(isSelected ? Colors.blue : Colors.grey.shade300).center.child(
+            isSelected
+                ? Icons.check.icon.white.s16.mk
+                : SizedBox.shrink(),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// 构建语言图标
+  ///
+  /// [languageCode] 语言代码
+  Widget _buildLanguageIcon(String languageCode) {
+    String flag;
+    Color bgColor;
+    
+    switch (languageCode) {
+      case 'zh':
+        flag = '🇨🇳';
+        bgColor = Colors.red.shade50;
+        break;
+      case 'en':
+        flag = '🇺🇸';
+        bgColor = Colors.blue.shade50;
+        break;
+      case 'es':
+        flag = '🇪🇸';
+        bgColor = Colors.yellow.shade50;
+        break;
+      default:
+        flag = '🌐';
+        bgColor = Colors.grey.shade50;
+    }
+    
+    return container.s50.circle.color(bgColor).center.child(
+      flag.text.f24.mk,
+    );
+  }
+
+  /// 获取语言描述
+  ///
+  /// [languageCode] 语言代码
+  String _getLanguageDescription(String languageCode) {
+    switch (languageCode) {
+      case 'zh':
+        return '中文（简体）';
+      case 'en':
+        return 'English (US)';
+      case 'es':
+        return 'Español';
+      default:
+        return '未知语言';
+    }
   }
 } 

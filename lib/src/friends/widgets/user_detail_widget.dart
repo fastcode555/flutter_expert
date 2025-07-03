@@ -77,44 +77,57 @@ class UserDetailWidget extends StatelessWidget {
           container.white.wFull.p16.child(
             isFriend 
               ? row.children([
-                  elevatedButton.expanded.child(
-                    row.center.children([
-                      Icons.message.icon.s16.white.mk,
-                      w8,
-                      "发消息".text.white.mk,
-                    ]),
-                  ).click(onTap: () {
-                    // TODO: 发消息功能
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('进入聊天...')),
-                    );
-                  }),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        // TODO: 发消息功能
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('进入聊天...')),
+                        );
+                      },
+                      child: container.blue.rounded8.pv12.center.child(
+                        row.center.children([
+                          Icons.message.icon.s16.white.mk,
+                          w8,
+                          "发消息".text.white.mk,
+                        ]),
+                      ),
+                    ),
+                  ),
                   w12,
-                  outlinedButton.expanded.child(
-                    row.center.children([
-                      Icons.phone.icon.s16.mk,
-                      w8,
-                      "语音通话".text.mk,
-                    ]),
-                  ).click(onTap: () {
-                    // TODO: 语音通话功能
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('语音通话...')),
-                    );
-                  }),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        // TODO: 语音通话功能
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('语音通话...')),
+                        );
+                      },
+                      child: container.border1.borderBlue.rounded8.pv12.center.child(
+                        row.center.children([
+                          Icons.phone.icon.s16.blue.mk,
+                          w8,
+                          "语音通话".text.blue.mk,
+                        ]),
+                      ),
+                    ),
+                  ),
                 ])
-              : elevatedButton.wFull.pv12.child(
-                  row.center.children([
-                    Icons.person_add.icon.s16.white.mk,
-                    w8,
-                    "添加到通讯录".text.white.mk,
-                  ]),
-                ).click(onTap: () {
-                  // TODO: 加好友功能
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('已发送好友请求')),
-                  );
-                }),
+              : GestureDetector(
+                  onTap: () {
+                    // TODO: 加好友功能
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('已发送好友请求')),
+                    );
+                  },
+                  child: container.wFull.blue.rounded8.pv12.center.child(
+                    row.center.children([
+                      Icons.person_add.icon.s16.white.mk,
+                      w8,
+                      "添加到通讯录".text.white.mk,
+                    ]),
+                  ),
+                ),
           ),
           
           h32,

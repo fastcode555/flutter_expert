@@ -4,7 +4,7 @@
 ///
 /// 创建时间：2024-06-10
 /// 作者：AI助手
-/// 最后修改时间：2024-06-10
+/// 最后修改时间：2024-12-19
 class NotificationModel {
   /// 通知ID
   final String id;
@@ -24,4 +24,45 @@ class NotificationModel {
     required this.timestamp,
     required this.isRead,
   });
+
+  /// 创建模型副本
+  ///
+  /// 可以选择性地更新特定字段
+  NotificationModel copyWith({
+    String? id,
+    String? type,
+    String? content,
+    DateTime? timestamp,
+    bool? isRead,
+  }) {
+    return NotificationModel(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      content: content ?? this.content,
+      timestamp: timestamp ?? this.timestamp,
+      isRead: isRead ?? this.isRead,
+    );
+  }
+
+  /// 从 JSON 创建模型实例
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      id: json['id'] as String,
+      type: json['type'] as String,
+      content: json['content'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      isRead: json['isRead'] as bool,
+    );
+  }
+
+  /// 转换为 JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'content': content,
+      'timestamp': timestamp.toIso8601String(),
+      'isRead': isRead,
+    };
+  }
 } 

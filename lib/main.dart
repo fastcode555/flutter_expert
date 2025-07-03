@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
+import 'src/auth/widgets/login_widget.dart';
 import 'src/profile/widgets/profile_edit_widget.dart';
+import 'src/feed/widgets/feed_list_widget.dart';
+import 'src/chat/widgets/message_list_widget.dart';
+import 'src/friends/widgets/friend_list_widget.dart';
+import 'src/notifications/widgets/notification_list_widget.dart';
+import 'src/settings/widgets/settings_page_widget.dart';
 
 void main() {
   // 如有必要，可在此初始化 tailwind
@@ -41,6 +47,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           home: const MyHomePage(),
+          debugShowCheckedModeBanner: false,
         );
       },
     );
@@ -82,23 +89,170 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
         // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: 'Flutter Expert'.text.f18.bold.mk,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: 'Flutter Expert Demo'.text.black.f18.bold.mk,
+        centerTitle: true,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: 'Go to Profile Edit'.elevatedButton.blue.textWhite.click(
-          onTap: () {
-            Get.to(() => const ProfileEditWidget());
-          },
-        ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: column.children([
+          // 应用标题
+          container.wFull.center.pv20.child(
+            column.center.children([
+              container.s80.circle.blue100.center.child(
+                Icons.flutter_dash.icon.blue.s40.mk,
+              ),
+              h16,
+              'Flutter Expert'.text.black.f24.bold.mk,
+              h8,
+              '使用 flutter_tailwind 重构的现代化应用'.text.grey600.f14.center.mk,
+            ]),
+          ),
+          
+          h24,
+          
+          // 功能模块网格
+          _buildModuleGrid(),
+          
+          h32,
+          
+          // 应用信息
+          container.white.rounded12.p16.cardShadow.child(
+            column.children([
+              '重构成果'.text.black.f16.bold.mk,
+              h12,
+              row.children([
+                Icons.check_circle.icon.green.s16.mk,
+                w8,
+                '完成 Auth 模块重构'.text.black87.f14.mk,
+              ]),
+              h8,
+              row.children([
+                Icons.check_circle.icon.green.s16.mk,
+                w8,
+                '完成 Profile 模块重构'.text.black87.f14.mk,
+              ]),
+              h8,
+              row.children([
+                Icons.check_circle.icon.green.s16.mk,
+                w8,
+                '完成 Feed 模块重构'.text.black87.f14.mk,
+              ]),
+              h8,
+              row.children([
+                Icons.check_circle.icon.green.s16.mk,
+                w8,
+                '完成 Chat 模块重构'.text.black87.f14.mk,
+              ]),
+              h8,
+              row.children([
+                Icons.check_circle.icon.green.s16.mk,
+                w8,
+                '完成 Settings 模块重构'.text.black87.f14.mk,
+              ]),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// 构建模块网格
+  Widget _buildModuleGrid() {
+    final modules = [
+      {
+        'title': '登录',
+        'icon': Icons.login,
+        'color': Colors.blue,
+        'page': const LoginWidget(),
+      },
+      {
+        'title': '资料编辑',
+        'icon': Icons.edit,
+        'color': Colors.green,
+        'page': const ProfileEditWidget(),
+      },
+      {
+        'title': '动态流',
+        'icon': Icons.dynamic_feed,
+        'color': Colors.orange,
+        'page': const FeedListWidget(),
+      },
+      {
+        'title': '聊天',
+        'icon': Icons.chat,
+        'color': Colors.purple,
+        'page': const MessageListWidget(),
+      },
+      {
+        'title': '好友列表',
+        'icon': Icons.people,
+        'color': Colors.red,
+        'page': const FriendListWidget(),
+      },
+      {
+        'title': '通知',
+        'icon': Icons.notifications,
+        'color': Colors.amber,
+        'page': const NotificationListWidget(),
+      },
+      {
+        'title': '设置',
+        'icon': Icons.settings,
+        'color': Colors.teal,
+        'page': const SettingsPageWidget(),
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: modules.length,
+      itemBuilder: (context, index) {
+        final module = modules[index];
+        return _buildModuleCard(
+          module['title'] as String,
+          module['icon'] as IconData,
+          module['color'] as Color,
+          module['page'] as Widget,
+        );
+      },
+    );
+  }
+
+  /// 构建模块卡片
+  Widget _buildModuleCard(
+    String title,
+    IconData icon,
+    Color color,
+    Widget page,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => page);
+      },
+      child: container.white.rounded12.cardShadow.child(
+        column.center.children([
+          container.s50.circle.color(color.withOpacity(0.1)).center.child(
+            icon.icon.color(color).s24.mk,
+          ),
+          h12,
+          title.text.black87.f14.bold.center.mk,
+          h4,
+          '点击体验'.text.grey.f12.center.mk,
+        ]),
       ),
     );
   }

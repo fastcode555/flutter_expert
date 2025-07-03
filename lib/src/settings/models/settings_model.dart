@@ -4,7 +4,7 @@
 ///
 /// 创建时间：2024-06-10
 /// 作者：AI助手
-/// 最后修改时间：2024-06-10
+/// 最后修改时间：2024-12-19
 class SettingsModel {
   /// 是否开启通知
   final bool notificationEnabled;
@@ -21,4 +21,41 @@ class SettingsModel {
     required this.language,
     required this.account,
   });
+
+  /// 创建模型副本
+  ///
+  /// 可以选择性地更新特定字段
+  SettingsModel copyWith({
+    bool? notificationEnabled,
+    bool? privacyEnabled,
+    String? language,
+    String? account,
+  }) {
+    return SettingsModel(
+      notificationEnabled: notificationEnabled ?? this.notificationEnabled,
+      privacyEnabled: privacyEnabled ?? this.privacyEnabled,
+      language: language ?? this.language,
+      account: account ?? this.account,
+    );
+  }
+
+  /// 从 JSON 创建模型实例
+  factory SettingsModel.fromJson(Map<String, dynamic> json) {
+    return SettingsModel(
+      notificationEnabled: json['notificationEnabled'] as bool,
+      privacyEnabled: json['privacyEnabled'] as bool,
+      language: json['language'] as String,
+      account: json['account'] as String,
+    );
+  }
+
+  /// 转换为 JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'notificationEnabled': notificationEnabled,
+      'privacyEnabled': privacyEnabled,
+      'language': language,
+      'account': account,
+    };
+  }
 } 
