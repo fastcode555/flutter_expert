@@ -85,13 +85,10 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
             
             // 说明文字
             container.white.p16.child(
-              column.children([
+              column.spacing4.children([
                 '语言说明'.text.black.f16.bold.mk,
-                h8,
                 '• 切换语言后将立即生效'.text.grey600.f14.mk,
-                h4,
                 '• 支持的语言包括简体中文、英语和西班牙语'.text.grey600.f14.mk,
-                h4,
                 '• 部分页面可能需要重新进入才能完全生效'.text.grey600.f14.mk,
               ]),
             ),
@@ -117,9 +114,8 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
           w16,
           
           // 语言名称
-          column.crossStart.expanded.children([
+          column.crossStart.expanded.spacing4.children([
             language.name.text.black.f16.bold.mk,
-            h4,
             _getLanguageDescription(language.languageCode).text.grey600.f14.mk,
           ]),
           w16,

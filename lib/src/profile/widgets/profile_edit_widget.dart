@@ -110,18 +110,15 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
           h24,
           
           // 表单区域 - 使用Column的完整属性支持，避免Container包装
-          column.white.ph16.pv20.children([
+          column.white.ph16.pv20.spacing20.children([
             // 昵称输入
             _buildNicknameField(),
-            h20,
             
             // 简介输入
             _buildBioField(),
-            h20,
             
             // 性别选择
             _buildGenderField(),
-            h20,
             
             // 生日选择
             _buildBirthdayField(),
@@ -141,11 +138,9 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
         container.blue100.h120.wFull.rounded8.center.child(
           '封面图'.text.blue.f16.mk,
         ),
-        // 编辑按钮
-        Positioned(
-          right: 8,
-          bottom: 8,
-          child: GestureDetector(
+        // 编辑按钮 - 优化为预定义API
+        positioned.r8.b8.child(
+          GestureDetector(
             onTap: _selectCover,
             child: container.blue.rounded20.p8.child(
               Icons.camera_alt.icon.white.s20.mk,
@@ -163,10 +158,8 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
             Icons.person.icon.grey600.s40.mk,
           ),
           // 编辑按钮
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: GestureDetector(
+          positioned.r0.b0.child(
+            GestureDetector(
               onTap: _selectAvatar,
               child: container.blue.circle.p6.child(
                 Icons.camera_alt.icon.white.s16.mk,

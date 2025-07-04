@@ -169,11 +169,9 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
         ),
       ),
       
-      // 头像
-      Positioned(
-        left: 20,
-        bottom: -40,
-        child: container.s80.circle.white.p4.child(
+      // 头像 - 优化为预定义API和参数混合
+      positioned.l20.b(-40).child(
+        container.s80.circle.white.p4.child(
           container.s72.circle.grey200.center.child(
             Icons.person.icon.grey600.s40.mk,
           ),

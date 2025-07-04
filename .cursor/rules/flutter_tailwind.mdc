@@ -396,6 +396,194 @@ stack.center.children([...])
 stack.topLeft.children([...])
 ```
 
+#### Positioned 定位组件 ⭐
+```dart
+// 基础定位 - 单个方向
+positioned.l16.child(widget)        // 左边距16
+positioned.r16.child(widget)        // 右边距16
+positioned.t16.child(widget)        // 上边距16
+positioned.b16.child(widget)        // 下边距16
+
+// 组合定位 - 多个方向
+positioned.t0.l0.child(widget)      // 左上角定位
+positioned.t0.r0.child(widget)      // 右上角定位
+positioned.b0.l0.child(widget)      // 左下角定位
+positioned.b0.r0.child(widget)      // 右下角定位
+
+// 边缘拉伸定位
+positioned.l0.r0.t0.child(widget)   // 顶部横向拉伸
+positioned.l0.r0.b0.child(widget)   // 底部横向拉伸
+positioned.t0.b0.l16.child(widget)  // 左侧纵向拉伸，距左16
+positioned.t0.b0.r16.child(widget)  // 右侧纵向拉伸，距右16
+
+// 全屏填充定位
+positioned.l0.r0.t0.b0.child(widget) // 完全填充Stack
+
+// 自定义数值定位（仅当预定义不存在时使用）
+positioned.l(20.5).t(15.2).child(widget)  // ✅ 可用：20.5和15.2没有预定义
+positioned.r30.b(25).child(widget)        // ✅ 混合：30用预定义，25无预定义用参数
+
+// 负值定位（超出边界）- 负值只能使用参数方法
+positioned.b(-40).l16.child(widget)       // ✅ 负值用参数，16用预定义
+positioned.r(-20).t10.child(widget)       // ✅ 负值用参数，10用预定义
+
+// 预定义数值范围（0-100，每2递增）
+positioned.l0.child(widget)    // 左边距0
+positioned.l2.child(widget)    // 左边距2
+positioned.l4.child(widget)    // 左边距4
+// ... 支持到 l100, r100, t100, b100
+
+// 常用定位模式
+positioned.r16.t16.child(closeButton)     // 右上角关闭按钮
+positioned.b16.r16.child(fabButton)       // 右下角浮动按钮
+positioned.b0.l0.r0.child(bottomBar)      // 底部工具栏
+positioned.t0.l0.r0.child(topBar)         // 顶部工具栏
+positioned.l16.r16.t50.child(centerCard)  // 水平居中卡片
+
+// 与Stack结合的完整示例
+stack.children([
+  // 背景层
+  'Background Content'.text.center.mk,
+
+  // 浮动层
+  positioned.r16.t16.child(
+    Icons.close.iconButton.red.s24.click(onTap: onClose)
+  ),
+
+  // 底部层
+  positioned.b0.l0.r0.child(
+    row.spaceBetween.p16.white.children([
+      'Cancel'.textButton.grey.click(onTap: onCancel),
+      'Confirm'.elevatedButton.blue.click(onTap: onConfirm),
+    ])
+  ),
+
+  // 中心浮动卡片
+  positioned.l20.r20.t100.child(
+    container.white.rounded12.shadow.p20.child(
+      column.spacing16.children([
+        'Title'.text.f18.bold.mk,
+        'Content'.text.f14.grey.mk,
+      ])
+    )
+  ),
+])
+```
+
+##### Positioned 属性支持
+```dart
+// 基础定位属性
+.l(), .left()      // 左边距设置
+.r(), .right()     // 右边距设置
+.t(), .top()       // 上边距设置
+.b(), .bottom()    // 下边距设置
+
+// 预定义数值（推荐优先使用）
+.l0, .l2, .l4, .l6, .l8, .l10, .l12, .l14, .l16, .l18, .l20
+.l22, .l24, .l26, .l28, .l30, .l32, .l34, .l36, .l38, .l40
+.l42, .l44, .l46, .l48, .l50, .l52, .l54, .l56, .l58, .l60
+.l62, .l64, .l66, .l68, .l70, .l72, .l74, .l76, .l78, .l80
+.l82, .l84, .l86, .l88, .l90, .l92, .l94, .l96, .l98, .l100
+
+// r0-r100, t0-t100, b0-b100 同样支持
+```
+
+##### Positioned 使用规则
+
+**1. API 优先级规则（强制执行）**
+```dart
+// ✅ 第一优先级：必须优先使用预定义简化方法
+positioned.l16.t20.child(widget)       // 优先使用：因为16和20都有预定义
+positioned.l8.r12.b24.child(widget)    // 优先使用：因为8、12、24都有预定义
+
+// ✅ 第二优先级：仅当预定义不存在时，才使用参数方法
+positioned.l(17.5).t(23.2).child(widget)  // 可接受：17.5和23.2没有预定义
+positioned.l16.t(25.6).child(widget)      // 混合使用：16用预定义，25.6用参数
+
+// ❌ 错误用法：明明有预定义却使用参数方法
+positioned.l(16).t(20).child(widget)      // 错误：16和20都有预定义，应该用.l16.t20
+positioned.r(24).b(32).child(widget)      // 错误：24和32都有预定义，应该用.r24.b32
+```
+
+**选择流程**
+```dart
+// 步骤1：检查是否有预定义值（0-100，每2递增）
+// 如果需要的值在 [0, 2, 4, 6, 8, 10, 12, ..., 96, 98, 100] 范围内
+// -> 必须使用预定义方法
+
+// 步骤2：如果需要的值不在预定义范围内
+// -> 才可以使用参数方法
+
+// 示例判断：
+positioned.l14.child(widget)    // ✅ 14有预定义，使用.l14
+positioned.l(15).child(widget)  // ✅ 15无预定义，使用.l(15)
+positioned.l(14).child(widget)  // ❌ 14有预定义，不应使用.l(14)
+```
+
+**2. 常见布局模式**
+```dart
+// 角落定位
+positioned.t8.l8.child(topLeftWidget)     // 左上角
+positioned.t8.r8.child(topRightWidget)    // 右上角
+positioned.b8.l8.child(bottomLeftWidget)  // 左下角
+positioned.b8.r8.child(bottomRightWidget) // 右下角
+
+// 边缘拉伸
+positioned.l0.r0.t0.child(topBar)         // 顶部栏
+positioned.l0.r0.b0.child(bottomBar)      // 底部栏
+positioned.t0.b0.l0.child(leftSidebar)    // 左侧栏
+positioned.t0.b0.r0.child(rightSidebar)   // 右侧栏
+
+// 居中定位
+positioned.l20.r20.t100.child(centerCard) // 水平居中
+positioned.t20.b20.l100.child(verticalCard) // 垂直居中
+```
+
+**3. 避免常见问题**
+```dart
+// ❌ 避免：不必要的Container包装
+container.child(
+  stack.children([
+    positioned.t16.r16.child(widget)
+  ])
+)
+
+// ✅ 优化：直接使用Stack
+stack.children([
+  positioned.t16.r16.child(widget)
+])
+
+// ❌ 避免：过度复杂的嵌套定位
+positioned.l10.child(
+  positioned.t20.child(widget)  // 双重定位
+)
+
+// ✅ 优化：单次组合定位
+positioned.l10.t20.child(widget)
+
+// ❌ 避免：有预定义却使用参数方法
+positioned.l(16).r(20).child(widget)  // 错误：16和20都有预定义
+
+// ✅ 优化：使用预定义方法
+positioned.l16.r20.child(widget)      // 正确：使用预定义
+```
+
+**4. 预定义数值完整列表**
+```dart
+// L/R/T/B 都支持以下预定义数值（0-100，每2递增）：
+0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30,
+32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60,
+62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90,
+92, 94, 96, 98, 100
+
+// 使用示例
+positioned.l0.child(widget)     // ✅ 使用预定义 0
+positioned.l2.child(widget)     // ✅ 使用预定义 2
+positioned.l(1).child(widget)   // ✅ 1没有预定义，使用参数
+positioned.l(3).child(widget)   // ✅ 3没有预定义，使用参数
+positioned.l(2).child(widget)   // ❌ 错误：2有预定义，应该用.l2
+```
+
 #### SizedBox
 ```dart
 // 预定义间距
@@ -1316,7 +1504,63 @@ debugPrint('Text size: ${text.fontSize}');
   // 5. Container包装Row/Column仅设置属性的情况
   ```
 
-### 9. Row/Column 属性误用问题 🎯
+### 9. Positioned 定位API误用问题 🎯
+- **API优先级使用错误**: 有预定义值却使用参数方法
+  ```dart
+  // ❌ 错误：明明有预定义却使用参数方法
+  positioned.l(16).t(20).child(widget)      // 错误：16和20都有预定义
+  positioned.r(24).b(32).child(widget)      // 错误：24和32都有预定义
+  positioned.l(8).r(12).child(widget)       // 错误：8和12都有预定义
+
+  // ✅ 正确：使用预定义方法
+  positioned.l16.t20.child(widget)          // 正确：使用预定义
+  positioned.r24.b32.child(widget)          // 正确：使用预定义
+  positioned.l8.r12.child(widget)           // 正确：使用预定义
+
+  // ✅ 混合使用：预定义+参数
+  positioned.l16.t(25.5).child(widget)      // 正确：16用预定义，25.5用参数
+  positioned.r(15.2).b20.child(widget)      // 正确：15.2用参数，20用预定义
+  ```
+
+- **快速检查方法**: 判断数值是否在预定义范围内
+  ```dart
+  // 预定义范围：0, 2, 4, 6, 8, 10, 12, ..., 96, 98, 100（每2递增）
+
+  // 检查规则：
+  if (value >= 0 && value <= 100 && value % 2 == 0) {
+    // 必须使用预定义方法：.l16, .t20, .r24, .b32
+  } else {
+    // 可以使用参数方法：.l(15.5), .t(25), .r(33)
+  }
+  ```
+
+- **不必要的Container包装**: positioned组件外层包装多余容器
+  ```dart
+  // ❌ 问题：多余的容器包装
+  container.child(
+    stack.children([
+      positioned.t16.r16.child(widget)
+    ])
+  )
+
+  // ✅ 优化：直接使用Stack
+  stack.children([
+    positioned.t16.r16.child(widget)
+  ])
+  ```
+
+- **双重定位嵌套**: 避免positioned组件嵌套使用
+  ```dart
+  // ❌ 错误：双重定位嵌套
+  positioned.l10.child(
+    positioned.t20.child(widget)  // 无意义的嵌套
+  )
+
+  // ✅ 正确：单次组合定位
+  positioned.l10.t20.child(widget)
+  ```
+
+### 10. Row/Column 属性误用问题 🎯
 - **不知道Row/Column支持完整属性**: 了解Row/Column的完整能力
   ```dart
   // ❌ 误用：不知道Row支持这些属性
