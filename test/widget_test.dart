@@ -3,8 +3,8 @@
 // 测试Flutter Expert社交媒体应用的基本功能和组件。
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_expert/main.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('Flutter Expert 应用启动测试', (WidgetTester tester) async {

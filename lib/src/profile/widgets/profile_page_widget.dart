@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/profile/controllers/profile_controller.dart';
+import 'package:flutter_expert/src/profile/widgets/profile_edit_widget.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import '../controllers/profile_controller.dart';
-import '../models/profile_model.dart';
-import 'profile_edit_widget.dart';
 
 /// 个人中心主页面组件
 ///
@@ -14,7 +13,7 @@ import 'profile_edit_widget.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class ProfilePageWidget extends StatefulWidget {
-  const ProfilePageWidget({Key? key}) : super(key: key);
+  const ProfilePageWidget({super.key});
 
   @override
   State<ProfilePageWidget> createState() => _ProfilePageWidgetState();
@@ -116,7 +115,7 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '个人中心'.text.black.f18.bold.mk,

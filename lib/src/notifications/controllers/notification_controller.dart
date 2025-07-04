@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/notifications/models/notification_model.dart';
 import 'package:get/get.dart';
-import '../models/notification_model.dart';
 
 /// 通知控制器
 ///

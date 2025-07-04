@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/friends/models/friend_model.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import '../models/friend_model.dart';
 
 /// 用户详情页面组件
 ///
@@ -14,7 +14,7 @@ import '../models/friend_model.dart';
 class UserDetailWidget extends StatelessWidget {
   final FriendModel user;
 
-  const UserDetailWidget({Key? key, required this.user}) : super(key: key);
+  const UserDetailWidget({required this.user, super.key});
 
   /// 显示头像预览
   void _showAvatarPreview() {
@@ -25,7 +25,7 @@ class UserDetailWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: "详细资料".text.f18.bold.mk,
+        title: '详细资料'.text.f18.bold.mk,
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -57,8 +57,8 @@ class UserDetailWidget extends StatelessWidget {
           
           // 用户信息区域
           column.white.wFull.children([
-            _buildInfoRow("分组", user.group),
-            _buildInfoRow("状态", user.status),
+            _buildInfoRow('分组', user.group),
+            _buildInfoRow('状态', user.status),
           ]),
           
           h32,

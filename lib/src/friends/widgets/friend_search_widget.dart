@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class FriendSearchWidget extends StatefulWidget {
-  const FriendSearchWidget({Key? key}) : super(key: key);
+  const FriendSearchWidget({super.key});
 
   @override
   State<FriendSearchWidget> createState() => _FriendSearchWidgetState();
@@ -27,8 +27,8 @@ class _FriendSearchWidgetState extends State<FriendSearchWidget> {
   /// 执行搜索
   ///
   /// 根据输入的关键词搜索用户
-  void _performSearch() async {
-    final String keyword = _searchController.text.trim();
+  Future<void> _performSearch() async {
+    final keyword = _searchController.text.trim();
     if (keyword.isEmpty) {
       Get.snackbar(
         '提示',
@@ -59,7 +59,7 @@ class _FriendSearchWidgetState extends State<FriendSearchWidget> {
         {
           'id': '2',
           'username': '${keyword}_friend',
-          'nickname': '${keyword}的朋友',
+          'nickname': '$keyword的朋友',
           'avatar': 'https://example.com/avatar2.png',
           'friendStatus': 'pending',
           'mutualFriends': 12,
@@ -104,8 +104,8 @@ class _FriendSearchWidgetState extends State<FriendSearchWidget> {
   /// [username] 目标用户名
   /// [currentStatus] 当前好友状态
   void _handleFriendAction(String userId, String username, String currentStatus) {
-    String action = '';
-    String newStatus = 'none';
+    var action = '';
+    var newStatus = 'none';
     
     if (currentStatus == 'pending') {
       action = '已取消好友请求';
@@ -150,7 +150,7 @@ class _FriendSearchWidgetState extends State<FriendSearchWidget> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '添加好友'.text.black.f18.bold.mk,
@@ -326,7 +326,7 @@ class _FriendSearchWidgetState extends State<FriendSearchWidget> {
         );
         
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 

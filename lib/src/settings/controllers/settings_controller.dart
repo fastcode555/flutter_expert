@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/settings/models/settings_model.dart';
 import 'package:get/get.dart';
-import '../models/settings_model.dart';
 
 /// 设置控制器
 ///

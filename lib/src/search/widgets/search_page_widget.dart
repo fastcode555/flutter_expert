@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/search/widgets/search_result_list_widget.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import 'search_result_list_widget.dart';
 
 /// 搜索主页面组件
 ///
@@ -12,7 +12,7 @@ import 'search_result_list_widget.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class SearchPageWidget extends StatefulWidget {
-  const SearchPageWidget({Key? key}) : super(key: key);
+  const SearchPageWidget({super.key});
 
   @override
   State<SearchPageWidget> createState() => _SearchPageWidgetState();
@@ -93,14 +93,12 @@ class _SearchPageWidgetState extends State<SearchPageWidget> {
         content: '确定要清除所有搜索历史吗？'.text.grey600.f14.mk,
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: Get.back,
             child: '取消'.text.grey600.f14.mk,
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                _searchHistory.clear();
-              });
+              setState(_searchHistory.clear);
               Get.back();
               Get.snackbar(
                 '提示',
@@ -132,7 +130,7 @@ class _SearchPageWidgetState extends State<SearchPageWidget> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '搜索'.text.black.f18.bold.mk,
@@ -171,7 +169,7 @@ class _SearchPageWidgetState extends State<SearchPageWidget> {
                 prefixIcon: Icon(Icons.search, color: Colors.grey),
               ),
               style: const TextStyle(fontSize: 16),
-              onSubmitted: (value) => _performSearch(value),
+              onSubmitted: _performSearch,
             ),
           ),
           w12,
@@ -208,7 +206,7 @@ class _SearchPageWidgetState extends State<SearchPageWidget> {
         
         // 历史记录列表
         wrap.spacing8.runSpacing8.children(
-          _searchHistory.map((keyword) => _buildHistoryChip(keyword)).toList(),
+          _searchHistory.map(_buildHistoryChip).toList(),
         ),
       ]),
     );

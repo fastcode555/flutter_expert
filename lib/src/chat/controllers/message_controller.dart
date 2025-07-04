@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/chat/models/message_model.dart';
 import 'package:get/get.dart';
-import '../models/message_model.dart';
 
 /// 消息控制器
 ///

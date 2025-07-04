@@ -24,7 +24,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
   /// 发送重置密码邮件
   ///
   /// 验证邮箱地址并发送重置链接
-  void _sendResetEmail() async {
+  Future<void> _sendResetEmail() async {
     if (_emailController.text.isEmpty) {
       Get.snackbar(
         '提示',
@@ -75,7 +75,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '忘记密码'.text.black.f18.bold.mk,
@@ -123,7 +123,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                 
                 // 返回登录链接
                 GestureDetector(
-                  onTap: () => Get.back(),
+                  onTap: Get.back,
                   child: '返回登录'.text.blue.f14.center.mk,
                 ),
               ]),

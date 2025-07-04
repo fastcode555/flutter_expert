@@ -26,7 +26,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   /// 执行注册逻辑
   ///
   /// 验证用户输入并处理注册请求
-  void _handleRegister() async {
+  Future<void> _handleRegister() async {
     if (_usernameController.text.isEmpty || 
         _passwordController.text.isEmpty || 
         _emailController.text.isEmpty) {
@@ -73,7 +73,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '注册'.text.black.f18.bold.mk,

@@ -15,9 +15,9 @@ class MessageInputWidget extends StatefulWidget {
   final Function(String)? onSendMessage;
   
   const MessageInputWidget({
-    Key? key,
+    super.key,
     this.onSendMessage,
-  }) : super(key: key);
+  });
 
   @override
   State<MessageInputWidget> createState() => _MessageInputWidgetState();
@@ -89,9 +89,9 @@ class _MessageInputWidgetState extends State<MessageInputWidget> {
                 ];
                 final option = options[index];
                 return _buildOptionItem(
-                  option['title'] as String,
-                  option['icon'] as IconData,
-                  option['color'] as Color,
+                  option['title']! as String,
+                  option['icon']! as IconData,
+                  option['color']! as Color,
                 );
               },
             ),

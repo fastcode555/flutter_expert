@@ -1,6 +1,6 @@
+import 'package:flutter_expert/src/auth/models/auth_response_model.dart';
+import 'package:flutter_expert/src/auth/models/user_model.dart';
 import 'package:get/get.dart';
-import '../models/user_model.dart';
-import '../models/auth_response_model.dart';
 
 /// 认证控制器
 ///
@@ -39,7 +39,7 @@ class AuthController extends GetxController {
   /// 返回认证响应模型
   Future<AuthResponseModel> forgotPassword(String email) async {
     // TODO: 实现找回密码逻辑
-    return AuthResponseModel(success: true, message: '重置邮件已发送', token: null);
+    return AuthResponseModel(success: true, message: '重置邮件已发送');
   }
 
   /// 退出登录

@@ -25,7 +25,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   /// 执行登录逻辑
   ///
   /// 验证用户输入并处理登录请求
-  void _handleLogin() async {
+  Future<void> _handleLogin() async {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       Get.snackbar(
         '提示',
@@ -85,7 +85,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '登录'.text.black.f18.bold.mk,

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/settings/widgets/language_select_widget.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import '../controllers/settings_controller.dart';
-import '../models/settings_model.dart';
-import 'language_select_widget.dart';
 
 /// 设置页面组件
 ///
@@ -14,7 +12,7 @@ import 'language_select_widget.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class SettingsPageWidget extends StatelessWidget {
-  const SettingsPageWidget({Key? key}) : super(key: key);
+  const SettingsPageWidget({super.key});
 
   /// 跳转语言选择页面
   void _goToLanguageSelect() {
@@ -29,7 +27,7 @@ class SettingsPageWidget extends StatelessWidget {
         content: const Text('确定要清除应用缓存吗？'),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: Get.back,
             child: const Text('取消'),
           ),
           TextButton(
@@ -56,7 +54,7 @@ class SettingsPageWidget extends StatelessWidget {
         content: const Text('确定要退出当前账户吗？'),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: Get.back,
             child: const Text('取消'),
           ),
           TextButton(
@@ -82,7 +80,7 @@ class SettingsPageWidget extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '设置'.text.black.f18.bold.mk,

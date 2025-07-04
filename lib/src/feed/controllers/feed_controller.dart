@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/feed/models/feed_post_model.dart';
 import 'package:get/get.dart';
-import '../models/feed_post_model.dart';
 
 /// 动态流控制器
 ///

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/search/controllers/search_controller.dart' as search;
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import '../controllers/search_controller.dart' as search;
 
 /// 搜索结果列表组件
 ///
@@ -12,7 +12,7 @@ import '../controllers/search_controller.dart' as search;
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class SearchResultListWidget extends StatefulWidget {
-  const SearchResultListWidget({Key? key}) : super(key: key);
+  const SearchResultListWidget({super.key});
 
   @override
   State<SearchResultListWidget> createState() => _SearchResultListWidgetState();
@@ -147,7 +147,7 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '搜索结果'.text.black.f18.bold.mk,
@@ -202,13 +202,10 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
         switch (type) {
           case 'user':
             _handleUserTap(result);
-            break;
           case 'post':
             _handlePostTap(result);
-            break;
           case 'group':
             _handleGroupTap(result);
-            break;
         }
       },
       child: container.white.rounded12.cardShadow.child(
@@ -250,15 +247,12 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
       case 'user':
         iconData = Icons.person;
         bgColor = Colors.blue;
-        break;
       case 'post':
         iconData = Icons.article;
         bgColor = Colors.green;
-        break;
       case 'group':
         iconData = Icons.group;
         bgColor = Colors.orange;
-        break;
       default:
         iconData = Icons.help;
         bgColor = Colors.grey;
@@ -280,15 +274,12 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
       case 'user':
         label = '用户';
         color = Colors.blue;
-        break;
       case 'post':
         label = '动态';
         color = Colors.green;
-        break;
       case 'group':
         label = '群组';
         color = Colors.orange;
-        break;
       default:
         label = '其他';
         color = Colors.grey;
@@ -346,7 +337,7 @@ class _SearchResultListWidgetState extends State<SearchResultListWidget> {
         return Icons.chevron_right.icon.grey400.s20.mk;
         
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 } 

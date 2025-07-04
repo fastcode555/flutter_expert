@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/search/models/search_result_model.dart';
 import 'package:get/get.dart';
-import '../models/search_result_model.dart';
 
 /// 搜索控制器
 ///

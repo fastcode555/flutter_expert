@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class ProfileEditWidget extends StatefulWidget {
-  const ProfileEditWidget({Key? key}) : super(key: key);
+  const ProfileEditWidget({super.key});
 
   @override
   State<ProfileEditWidget> createState() => _ProfileEditWidgetState();
@@ -65,10 +65,10 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
   /// 选择生日
   ///
   /// 打开日期选择器
-  void _selectBirthday() async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectBirthday() async {
+    final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(1990, 1, 1),
+      initialDate: DateTime(1990),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
@@ -87,7 +87,7 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: '编辑资料'.text.black.f18.bold.mk,

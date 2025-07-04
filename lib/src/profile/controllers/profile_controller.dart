@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/profile/models/profile_model.dart';
 import 'package:get/get.dart';
-import '../models/profile_model.dart';
 
 /// 个人中心控制器
 ///

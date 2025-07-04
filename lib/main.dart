@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/auth/widgets/login_widget.dart';
+import 'package:flutter_expert/src/chat/widgets/message_list_widget.dart';
+import 'package:flutter_expert/src/feed/widgets/feed_list_widget.dart';
+import 'package:flutter_expert/src/friends/widgets/friend_list_widget.dart';
+import 'package:flutter_expert/src/notifications/widgets/notification_list_widget.dart';
+import 'package:flutter_expert/src/profile/widgets/profile_edit_widget.dart';
+import 'package:flutter_expert/src/settings/widgets/settings_page_widget.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import 'src/auth/widgets/login_widget.dart';
-import 'src/profile/widgets/profile_edit_widget.dart';
-import 'src/feed/widgets/feed_list_widget.dart';
-import 'src/chat/widgets/message_list_widget.dart';
-import 'src/friends/widgets/friend_list_widget.dart';
-import 'src/notifications/widgets/notification_list_widget.dart';
-import 'src/settings/widgets/settings_page_widget.dart';
 
 void main() {
   // 如有必要，可在此初始化 tailwind
@@ -223,10 +223,10 @@ class _MyHomePageState extends State<MyHomePage> {
       itemBuilder: (context, index) {
         final module = modules[index];
         return _buildModuleCard(
-          module['title'] as String,
-          module['icon'] as IconData,
-          module['color'] as Color,
-          module['page'] as Widget,
+          module['title']! as String,
+          module['icon']! as IconData,
+          module['color']! as Color,
+          module['page']! as Widget,
         );
       },
     );

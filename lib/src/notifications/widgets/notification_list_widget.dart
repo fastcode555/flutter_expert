@@ -103,7 +103,7 @@ class _NotificationListWidgetState extends State<NotificationListWidget> {
   /// 全部标记为已读
   void _markAllAsRead() {
     setState(() {
-      for (var notification in _notifications) {
+      for (final notification in _notifications) {
         notification['isRead'] = true;
       }
     });

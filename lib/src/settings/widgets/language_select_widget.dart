@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/i18n/controllers/locale_controller.dart';
+import 'package:flutter_expert/src/i18n/models/locale_model.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
-import '../../i18n/controllers/locale_controller.dart';
-import '../../i18n/models/locale_model.dart';
 
 /// 语言选择页面组件
 ///
@@ -13,7 +13,7 @@ import '../../i18n/models/locale_model.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class LanguageSelectWidget extends StatefulWidget {
-  const LanguageSelectWidget({Key? key}) : super(key: key);
+  const LanguageSelectWidget({super.key});
 
   @override
   State<LanguageSelectWidget> createState() => _LanguageSelectWidgetState();
@@ -31,7 +31,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
   ///
   /// [locale] 目标语言配置
   void _changeLanguage(LocaleModel locale) {
-    final LocaleController controller = Get.find<LocaleController>();
+    final controller = Get.find<LocaleController>();
     controller.changeLocale(locale);
     
     Get.snackbar(
@@ -56,7 +56,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
     return GetBuilder<LocaleController>(
       init: LocaleController(),
       builder: (controller) {
-        final String currentLang = controller.currentLocale.value.languageCode;
+        final currentLang = controller.currentLocale.value.languageCode;
         
         return Scaffold(
           // 应用栏配置
@@ -64,7 +64,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
             backgroundColor: Colors.white,
             elevation: 0,
             leading: GestureDetector(
-              onTap: () => Get.back(),
+              onTap: Get.back,
               child: Icons.arrow_back_ios.icon.black.s20.mk,
             ),
             title: '选择语言'.text.black.f18.bold.mk,
@@ -103,7 +103,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
   /// [language] 语言配置
   /// [currentLang] 当前选中的语言代码
   Widget _buildLanguageItem(LocaleModel language, String currentLang) {
-    final bool isSelected = language.languageCode == currentLang;
+    final isSelected = language.languageCode == currentLang;
     
     return GestureDetector(
       onTap: () => _changeLanguage(language),
@@ -124,7 +124,7 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
           container.color(isSelected ? Colors.blue : Colors.grey.shade300).s24.circle.center.child(
             isSelected
                 ? Icons.check.icon.white.s16.mk
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ),
         ]),
       ),
@@ -142,15 +142,12 @@ class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
       case 'zh':
         flag = '🇨🇳';
         bgColor = Colors.red.shade50;
-        break;
       case 'en':
         flag = '🇺🇸';
         bgColor = Colors.blue.shade50;
-        break;
       case 'es':
         flag = '🇪🇸';
         bgColor = Colors.yellow.shade50;
-        break;
       default:
         flag = '🌐';
         bgColor = Colors.grey.shade50;

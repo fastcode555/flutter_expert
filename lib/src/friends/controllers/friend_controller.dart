@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/friends/models/friend_model.dart';
 import 'package:get/get.dart';
-import '../models/friend_model.dart';
 
 /// 好友控制器
 ///

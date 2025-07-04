@@ -1,5 +1,5 @@
+import 'package:flutter_expert/src/i18n/models/locale_model.dart';
 import 'package:get/get.dart';
-import '../models/locale_model.dart';
 
 /// 语言/国际化控制器
 ///

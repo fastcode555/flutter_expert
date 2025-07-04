@@ -106,7 +106,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
         title: row.children([
@@ -218,7 +218,7 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
   /// 构建消息输入框
   Widget _buildMessageInput() {
-    final TextEditingController inputController = TextEditingController();
+    final inputController = TextEditingController();
 
     return container.white.p16.child(
       row.children([
