@@ -109,25 +109,23 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
           _buildHeaderSection(),
           h24,
           
-          // 表单区域
-          container.white.ph16.pv20.child(
-            column.children([
-              // 昵称输入
-              _buildNicknameField(),
-              h20,
-              
-              // 简介输入
-              _buildBioField(),
-              h20,
-              
-              // 性别选择
-              _buildGenderField(),
-              h20,
-              
-              // 生日选择
-              _buildBirthdayField(),
-            ]),
-          ),
+          // 表单区域 - 使用Column的完整属性支持，避免Container包装
+          column.white.ph16.pv20.children([
+            // 昵称输入
+            _buildNicknameField(),
+            h20,
+            
+            // 简介输入
+            _buildBioField(),
+            h20,
+            
+            // 性别选择
+            _buildGenderField(),
+            h20,
+            
+            // 生日选择
+            _buildBirthdayField(),
+          ]),
           h32,
         ]),
       ),
@@ -136,53 +134,50 @@ class _ProfileEditWidgetState extends State<ProfileEditWidget> {
 
   /// 构建头部区域（头像和封面）
   Widget _buildHeaderSection() {
-    return container.white.ph16.pv20.child(
-      column.children([
-        // 封面图片
-        container.blue100.h120.wFull.rounded8.mb16.child(
-          stack.children([
-            // 封面背景
-            container.wFull.hFull.rounded8.center.child(
-              '封面图'.text.blue.f16.mk,
-            ),
-            // 编辑按钮
-            Positioned(
-              right: 8,
-              bottom: 8,
-              child: GestureDetector(
-                onTap: _selectCover,
-                child: container.blue.rounded20.p8.child(
-                  Icons.camera_alt.icon.white.s20.mk,
-                ),
-              ),
-            ),
-          ]),
+    return column.white.ph16.pv20.children([
+      // 封面图片
+      stack.children([
+        // 封面背景 - 使用Container的完整属性，避免多层包装
+        container.blue100.h120.wFull.rounded8.center.child(
+          '封面图'.text.blue.f16.mk,
         ),
-        
-        // 头像区域
-        row.center.children([
-          stack.children([
-            // 头像
-            container.grey200.s80.circle.center.child(
-              Icons.person.icon.grey600.s40.mk,
+        // 编辑按钮
+        Positioned(
+          right: 8,
+          bottom: 8,
+          child: GestureDetector(
+            onTap: _selectCover,
+            child: container.blue.rounded20.p8.child(
+              Icons.camera_alt.icon.white.s20.mk,
             ),
-            // 编辑按钮
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: GestureDetector(
-                onTap: _selectAvatar,
-                child: container.blue.circle.p6.child(
-                  Icons.camera_alt.icon.white.s16.mk,
-                ),
+          ),
+        ),
+      ]),
+      h16,
+      
+      // 头像区域
+      row.center.children([
+        stack.children([
+          // 头像
+          container.grey200.s80.circle.center.child(
+            Icons.person.icon.grey600.s40.mk,
+          ),
+          // 编辑按钮
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: GestureDetector(
+              onTap: _selectAvatar,
+              child: container.blue.circle.p6.child(
+                Icons.camera_alt.icon.white.s16.mk,
               ),
             ),
-          ]),
+          ),
         ]),
-        h8,
-        '点击编辑头像和封面'.text.grey600.f12.center.mk,
       ]),
-    );
+      h8,
+      '点击编辑头像和封面'.text.grey600.f12.center.mk,
+    ]);
   }
 
   /// 构建昵称输入字段

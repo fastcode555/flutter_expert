@@ -651,13 +651,13 @@ row.children([
 ])
 
 // ✅ 优化：使用spacing属性统一间距
-column.spacing(20).children([
+column.spacing20.children([  // 优先使用预定义方法
   _buildHeaderSection(),
   _buildContentSection(),
   _buildFooterSection(),
 ])
 
-row.spacing(16).children([
+row.spacing16.children([     // 优先使用预定义方法
   _buildLeftPanel(),
   _buildRightPanel(),
 ])
@@ -690,8 +690,72 @@ row.spaceBetween.children([
 
 ### 3. 间距优化 ⭐
 
+#### Spacing API 优先级规则 ⭐⭐⭐
+**重要**: spacing 属性有两种写法，必须按以下优先级使用：
+
+```dart
+// 🎯 优先级1: 使用预定义的简化方法 (首选)
+column.spacing20.children([...])    // ✅ 最佳实践
+row.spacing16.children([...])       // ✅ 最佳实践
+gridview.spacing12.builder(...)     // ✅ 最佳实践
+
+// 🎯 优先级2: 使用传统方法 (仅当预定义不存在时)
+column.spacing(25).children([...])  // ⚠️ 仅当spacing25不存在时使用
+row.spacing(13).children([...])     // ⚠️ 仅当spacing13不存在时使用
+
+// 常用预定义spacing值
+// spacing4, spacing8, spacing12, spacing16, spacing20, spacing24, spacing32
+```
+
+**选择规则**:
+1. 首先检查是否有对应的预定义spacing方法（如 `.spacing20`）
+2. 如果预定义的值存在，必须使用预定义方法，不允许使用传统写法
+3. 只有当需要的间距值没有预定义时，才使用传统的 `.spacing(value)` 方法
+4. 常见的8、12、16、20、24像素间距都有预定义方法，应优先使用
+
 #### 使用 spacing 属性替代手动间距组件
-Row 和 Column 的 `spacing` 属性是一个重要的优化特性，可以显著简化代码并提升性能：
+
+**⚠️ 重要限制：只有当间距完全一致时才使用 spacing**
+
+Row 和 Column 的 `spacing` 属性是一个重要的优化特性，但必须在正确的场景下使用：
+
+**设计原则：页面美观 > 性能优化**
+
+1. **✅ 适合使用 spacing 的场景**：所有子组件间距完全一致
+2. **❌ 不适合使用 spacing 的场景**：需要不同间距来保持页面美观
+
+```dart
+// ✅ 适合用spacing：所有间距都是16
+column.spacing16.children([
+  _buildHeader(),      // 下方16px间距
+  _buildContent(),     // 下方16px间距
+  _buildFooter(),      // 无间距（最后一个）
+])
+
+// ❌ 不适合用spacing：需要不同间距保持美观
+column.children([
+  _buildHeader(),
+  h8,   // 紧凑间距：标题与副标题
+  _buildSubHeader(),
+  h24,  // 大间距：分组之间
+  _buildContent(),
+  h12,  // 中等间距：内容之间
+  _buildDetails(),
+])
+
+// ✅ 正确：保持不同间距来维护视觉层次
+column.children([
+  'Main Title'.text.f24.bold.mk,
+  h8,   // 小间距：标题和副标题关系紧密
+  'Subtitle'.text.f16.grey.mk,
+  h32,  // 大间距：明确的内容分组
+  'Section 1'.text.f18.mk,
+  h16,  // 标准间距：段落之间
+  'Content here...'.text.mk,
+])
+```
+
+Row 和 Column 的 `spacing` 属性可以显著简化代码并提升性能，但使用前要确保：
 
 ```dart
 // ❌ 错误做法：手动添加间距组件
@@ -705,8 +769,8 @@ column.children([
   _buildBirthdayField(),
 ])
 
-// ✅ 正确做法：使用 spacing 属性
-column.spacing(20).children([
+// ✅ 正确做法：使用 spacing 属性（优先使用预定义方法）
+column.spacing20.children([  // 使用预定义的spacing20
   _buildNicknameField(),
   _buildBioField(),
   _buildGenderField(),
@@ -714,7 +778,7 @@ column.spacing(20).children([
 ])
 
 // Row 的 spacing 使用示例
-row.spacing(16).children([
+row.spacing16.children([      // 使用预定义的spacing16
   'First'.text.mk,
   'Second'.text.mk,
   'Third'.text.mk,
@@ -727,17 +791,20 @@ row.spacing(16).children([
 3. **维护性好**：统一间距设置，易于修改
 4. **视觉清晰**：减少代码噪音，提高可读性
 
-#### 常用 spacing 值
+#### 常用 spacing 值及优先级用法
 ```dart
-column.spacing(8).children([...])   // 小间距
-column.spacing(16).children([...])  // 标准间距
-column.spacing(24).children([...])  // 大间距
-column.spacing(32).children([...])  // 特大间距
+// ✅ 优先使用：预定义的spacing方法
+column.spacing8.children([...])     // 小间距
+column.spacing16.children([...])    // 标准间距
+column.spacing24.children([...])    // 大间距
+column.spacing32.children([...])    // 特大间距
 
-// 也可以使用预定义的spacing
-column.spacing8.children([...])
-column.spacing16.children([...])
-column.spacing24.children([...])
+// ⚠️ 仅当预定义不存在时使用：传统方法
+column.spacing(10).children([...])  // 当spacing10不存在时才用
+column.spacing(28).children([...])  // 当spacing28不存在时才用
+
+// 🎯 预定义spacing完整列表
+// spacing4, spacing8, spacing12, spacing16, spacing20, spacing24, spacing28, spacing32
 ```
 
 ### 4. 性能优化
@@ -1087,6 +1154,52 @@ debugPrint('Text size: ${text.fontSize}');
   ```
 
 ### 7. spacing 间距使用问题 ⭐⭐⭐
+
+- **使用原则错误**: 在不适合的场景下强制使用spacing
+  ```dart
+  // ❌ 错误：强制使用spacing破坏页面美观
+  column.spacing16.children([
+    'Main Title'.text.f24.bold.mk,    // 需要与副标题紧凑间距(8px)
+    'Subtitle'.text.f16.grey.mk,      // 需要与内容大间距(32px)
+    'Content Section'.text.mk,        // 标准间距就够了(16px)
+  ])
+
+  // ✅ 正确：保持美观优先，使用不同间距
+  column.children([
+    'Main Title'.text.f24.bold.mk,
+    h8,   // 标题与副标题：紧凑关系
+    'Subtitle'.text.f16.grey.mk,
+    h32,  // 分组之间：明确分隔
+    'Content Section'.text.mk,
+  ])
+
+  // ✅ 或者在间距一致时使用spacing
+  column.spacing16.children([  // 所有间距都是16时
+    _buildCard1(),
+    _buildCard2(),
+    _buildCard3(),
+  ])
+  ```
+
+  **设计原则**: 页面美观 > 性能优化 > 代码简洁
+
+- **spacing API优先级错误**: 使用了传统方法而不是预定义方法
+  ```dart
+  // ❌ 问题代码：使用传统方法
+  column.spacing(20).children([...])   // 错误：spacing20存在时不应使用
+  row.spacing(16).children([...])      // 错误：spacing16存在时不应使用
+  gridview.spacing(12).builder(...)    // 错误：spacing12存在时不应使用
+
+  // ✅ 解决方案：使用预定义方法
+  column.spacing20.children([...])     // 正确：优先使用预定义方法
+  row.spacing16.children([...])        // 正确：优先使用预定义方法
+  gridview.spacing12.builder(...)      // 正确：优先使用预定义方法
+
+  // ✅ 只有非预定义值才使用传统方法
+  column.spacing(25).children([...])   // 正确：spacing25不存在，使用传统方法
+  row.spacing(13).children([...])      // 正确：spacing13不存在，使用传统方法
+  ```
+
 - **手动间距组件冗余**: 发现代码中有大量 h20、w16 等手动间距
   ```dart
   // ❌ 问题代码：手动插入间距组件
@@ -1098,8 +1211,8 @@ debugPrint('Text size: ${text.fontSize}');
     _buildFooterSection(),
   ])
 
-  // ✅ 解决方案：使用 spacing 属性
-  column.spacing(20).children([
+  // ✅ 解决方案：使用 spacing 属性（预定义优先）
+  column.spacing20.children([  // 使用预定义方法
     _buildHeaderSection(),
     _buildContentSection(),
     _buildFooterSection(),
@@ -1133,8 +1246,8 @@ debugPrint('Text size: ${text.fontSize}');
     if (index < 99) h12,  // 99个额外的Widget
   ]).expand((x) => x).toList())
 
-  // ✅ 性能好：使用 spacing
-  column.spacing(12).children(
+  // ✅ 性能好：使用 spacing（预定义优先）
+  column.spacing12.children(  // 使用预定义方法
     List.generate(100, (index) => buildListItem(index))
   )
   ```
@@ -1260,6 +1373,20 @@ debugPrint('Text size: ${text.fontSize}');
 | **Wrap** | `wrap.children([...])` | `spacing8`, `runSpacing8`, `center`, `expanded` | `wrap.spacing16.runSpacing12.center.expanded.children([...])` |
 | **Stack** | `stack.children([...])` | `center`, `topLeft`, `fit`, `expanded` | `stack.center.expanded.children([baseWidget, overlay])` |
 
+### Spacing API 优先级速查表 ⭐⭐⭐
+
+| API类型 | 优先级 | 使用场景 | 示例 |
+|---------|--------|----------|------|
+| **预定义方法** ⭐ | 🎯 第一优先级 | 常用间距值 | `column.spacing20.children([...])` |
+| **传统方法** | ⚠️ 第二优先级 | 非预定义值 | `column.spacing(25).children([...])` |
+
+**预定义值列表**: `spacing4`, `spacing8`, `spacing12`, `spacing16`, `spacing20`, `spacing24`, `spacing28`, `spacing32`
+
+**选择流程**:
+1. 检查间距值是否在预定义列表中
+2. 如果在，必须使用预定义方法（如 `.spacing20`）
+3. 如果不在，使用传统方法（如 `.spacing(25)`）
+
 ### 间距系统速查表
 
 | 类型 | 可用值 | 示例 |
@@ -1313,7 +1440,7 @@ debugPrint('Text size: ${text.fontSize}');
 | **空布局容器** | Row/Column为空或只有间距 | 使用SizedBox代替 | `column.children([h16])` → `h16` |
 | **Row/Column外包装** | Container包装Row/Column设置属性 | 直接在Row/Column上设置 | `container.p16.red.child(row.children([...]))` → `row.p16.red.children([...])` |
 | **尺寸外包装** | SizedBox包装Row/Column设置尺寸 | 直接在Row/Column上设置 | `sizedBox.w200.child(column.children([...]))` → `column.w200.children([...])` |
-| **手动间距组件** ⭐ | 子组件间手动插入h/w间距 | 使用spacing属性统一间距 | `column.children([a, h20, b])` → `column.spacing(20).children([a, b])` |
+| **手动间距组件** ⭐ | 子组件间手动插入h/w间距且间距完全一致 | 仅在间距一致时使用spacing | `column.children([a, h20, b, h20, c])` → `column.spacing20.children([a, b, c])` |
 
 ## 贡献指南
 
@@ -1342,9 +1469,19 @@ debugPrint('Text size: ${text.fontSize}');
    - **SizedBox包装检查**：Row/Column本身支持尺寸设置，避免SizedBox包装
    - **教育团队**：确保团队成员了解Row/Column的完整属性支持能力
 10. **spacing 属性优先使用规范** ⭐⭐⭐：
-    - **强制使用spacing**：Row/Column 的子组件间距必须优先使用 spacing 属性
-    - **禁止手动间距**：严格禁止在 Row/Column 中手动插入 h20、w16 等间距组件
-    - **统一间距管理**：所有子组件间距通过 spacing(value) 统一设置
+    - **使用前提条件** ⚠️ **最重要**：
+      - **仅当间距完全一致时使用spacing**：所有子组件间距必须相同
+      - **设计原则**：页面美观 > 性能优化 > 代码简洁
+      - **保持灵活性**：需要不同间距来维护视觉层次时，继续使用手动间距组件
+    - **API优先级**:
+      - 🎯 **第一优先级**: 使用预定义的简化方法（如 `.spacing20`）
+      - ⚠️ **第二优先级**: 仅当预定义不存在时使用传统方法（如 `.spacing(25)`）
+    - **使用spacing的场景**：Row/Column 所有子组件间距完全一致时
+    - **保持手动间距的场景**：需要不同间距来保持页面美观时
+    - **API选择规则**：
+      - 首先检查是否有对应的预定义spacing方法
+      - 常用值(4,8,12,16,20,24,28,32)都有预定义，必须使用预定义
+      - 非常用值才允许使用传统 `.spacing(value)` 方法
     - **性能考量**：spacing 属性减少 Widget 数量，提升渲染性能
-    - **代码评审重点**：Code Review 必须检查是否正确使用 spacing 属性
-    - **重构建议**：发现手动间距组件时，立即重构为 spacing 属性
+    - **代码评审重点**：Code Review 必须检查spacing API优先级使用是否正确
+    - **重构建议**：发现手动间距组件或错误spacing用法时，立即重构

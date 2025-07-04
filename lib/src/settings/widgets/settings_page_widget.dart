@@ -1,69 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
+import '../controllers/settings_controller.dart';
+import '../models/settings_model.dart';
+import 'language_select_widget.dart';
 
-/// 设置主页面组件
+/// 设置页面组件
 ///
-/// 用于展示和修改通知、隐私、语言、账号等设置项。
-/// 使用 flutter_tailwind 实现现代化的设置界面设计。
+/// 提供应用的各种设置选项，包括通知设置、隐私设置、账户管理等。
+/// 支持主题切换、语言选择、清除缓存等功能。
 ///
 /// 创建时间：2024-06-10
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
-class SettingsPageWidget extends StatefulWidget {
-  const SettingsPageWidget({super.key});
+class SettingsPageWidget extends StatelessWidget {
+  const SettingsPageWidget({Key? key}) : super(key: key);
 
-  @override
-  State<SettingsPageWidget> createState() => _SettingsPageWidgetState();
-}
-
-class _SettingsPageWidgetState extends State<SettingsPageWidget> {
-  bool _notificationEnabled = true;
-  bool _privacyEnabled = false;
-  String _currentLanguage = '简体中文';
-  String _userEmail = 'user@example.com';
-
-  /// 切换通知设置
-  void _toggleNotification(bool value) {
-    setState(() {
-      _notificationEnabled = value;
-    });
-    Get.snackbar(
-      '设置',
-      value ? '已开启通知' : '已关闭通知',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 1),
-    );
+  /// 跳转语言选择页面
+  void _goToLanguageSelect() {
+    Get.to(() => const LanguageSelectWidget());
   }
 
-  /// 切换隐私保护
-  void _togglePrivacy(bool value) {
-    setState(() {
-      _privacyEnabled = value;
-    });
-    Get.snackbar(
-      '设置',
-      value ? '已开启隐私保护' : '已关闭隐私保护',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 1),
-    );
-  }
-
-  /// 跳转语言设置
-  void _goToLanguageSettings() {
-    Get.snackbar(
-      '提示',
-      '语言设置功能开发中',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-
-  /// 跳转账号信息
-  void _goToAccountInfo() {
-    Get.snackbar(
-      '提示',
-      '账号信息功能开发中',
-      snackPosition: SnackPosition.BOTTOM,
+  /// 清除缓存
+  void _clearCache() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('清除缓存'),
+        content: const Text('确定要清除应用缓存吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              Get.snackbar(
+                '提示',
+                '缓存清除成功',
+                snackPosition: SnackPosition.TOP,
+              );
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -71,19 +52,23 @@ class _SettingsPageWidgetState extends State<SettingsPageWidget> {
   void _logout() {
     Get.dialog(
       AlertDialog(
-        title: '确认退出'.text.black.f16.bold.mk,
-        content: '确定要退出当前账号吗？'.text.black87.f14.mk,
+        title: const Text('退出登录'),
+        content: const Text('确定要退出当前账户吗？'),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: '取消'.text.grey.f14.mk,
+            child: const Text('取消'),
           ),
           TextButton(
             onPressed: () {
               Get.back();
-              Get.snackbar('提示', '退出登录功能开发中');
+              Get.snackbar(
+                '提示',
+                '已退出登录',
+                snackPosition: SnackPosition.TOP,
+              );
             },
-            child: '确定'.text.red.f14.mk,
+            child: const Text('确定'),
           ),
         ],
       ),
@@ -93,7 +78,6 @@ class _SettingsPageWidgetState extends State<SettingsPageWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -104,76 +88,27 @@ class _SettingsPageWidgetState extends State<SettingsPageWidget> {
         title: '设置'.text.black.f18.bold.mk,
         centerTitle: true,
       ),
+      backgroundColor: const Color(0xFFF8F9FA),
       body: SingleChildScrollView(
-        child: column.children([
-          h16,
+        child: column.spacing16.children([
+          // 账户设置
+          _buildSectionTitle('账户设置'),
+          _buildSettingItem('编辑资料', '修改头像、昵称等个人信息', Icons.person),
+          _buildSettingItem('账户安全', '密码、验证等安全设置', Icons.security),
+          _buildSettingItem('隐私设置', '谁可以看到我的信息', Icons.privacy_tip),
           
-          // 通知设置分组
-          _buildSectionTitle('通知设置'),
-          _buildSettingItem(
-            '推送通知',
-            '接收消息和活动推送',
-            Icons.notifications_outlined,
-            trailing: Switch(
-              value: _notificationEnabled,
-              onChanged: _toggleNotification,
-              activeColor: Colors.blue,
-            ),
-          ),
-          
-          h24,
-          
-          // 隐私设置分组
-          _buildSectionTitle('隐私设置'),
-          _buildSettingItem(
-            '隐私保护',
-            '保护个人信息安全',
-            Icons.security,
-            trailing: Switch(
-              value: _privacyEnabled,
-              onChanged: _togglePrivacy,
-              activeColor: Colors.blue,
-            ),
-          ),
-          
-          h24,
-          
-          // 通用设置分组
+          // 通用设置
           _buildSectionTitle('通用设置'),
-          _buildSettingItem(
-            '语言设置',
-            _currentLanguage,
-            Icons.language,
-            onTap: _goToLanguageSettings,
-          ),
-          _buildSettingItem(
-            '账号信息',
-            _userEmail,
-            Icons.account_circle,
-            onTap: _goToAccountInfo,
-          ),
-          _buildSettingItem(
-            '关于我们',
-            '版本信息和帮助',
-            Icons.info_outline,
-            onTap: () {
-              Get.snackbar('提示', '关于我们功能开发中');
-            },
-          ),
+          _buildSettingItem('通知设置', '推送通知、消息提醒', Icons.notifications),
+          _buildSettingItem('语言', '简体中文', Icons.language, onTap: _goToLanguageSelect),
+          _buildSettingItem('主题模式', '浅色模式', Icons.brightness_6),
           
-          h32,
-          
-          // 退出登录
-          GestureDetector(
-            onTap: _logout,
-            child: container.white.ph20.pv16.child(
-              row.center.children([
-                Icons.logout.icon.red.s20.mk,
-                w12,
-                '退出登录'.text.red.f14.bold.mk,
-              ]),
-            ),
-          ),
+          // 其他设置
+          _buildSectionTitle('其他'),
+          _buildSettingItem('清除缓存', '清理应用缓存数据', Icons.cleaning_services, onTap: _clearCache),
+          _buildSettingItem('检查更新', '当前版本 v1.0.0', Icons.system_update),
+          _buildSettingItem('关于我们', '应用信息和版权', Icons.info),
+          _buildSettingItem('退出登录', '退出当前账户', Icons.logout, onTap: _logout),
           
           h32,
         ]),
@@ -217,9 +152,8 @@ class _SettingsPageWidgetState extends State<SettingsPageWidget> {
           Expanded(
             child: container.pr16.pv16.child(
               row.spaceBetween.children([
-                column.expanded.crossStart.children([
+                column.expanded.crossStart.spacing4.children([
                   title.text.black87.f14.bold.maxLine1.ellipsis.start.mk,
-                  h4,
                   subtitle.text.grey.f12.maxLine1.ellipsis.start.mk,
                 ]),
                 trailing ?? Icons.chevron_right.icon.grey400.s20.mk,

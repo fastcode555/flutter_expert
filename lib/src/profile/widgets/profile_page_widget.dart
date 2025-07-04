@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
+import '../models/profile_model.dart';
 import 'profile_edit_widget.dart';
 
 /// 个人中心主页面组件
@@ -84,32 +85,23 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
   void _moreActions() {
     Get.bottomSheet(
       container.white.roundedT16.child(
-        column.children([
-          // 底部弹窗标题
+        column.spacing8.children([
+          // 标题
           container.wFull.pv16.child(
             '更多操作'.text.black.f16.bold.center.mk,
           ),
           
-          // 操作选项
-          _buildBottomSheetItem('分享资料', Icons.share, _shareProfile),
+          // 选项列表
           _buildBottomSheetItem('设置', Icons.settings, () {
-            Get.back();
-            Get.snackbar('提示', '跳转设置页面', snackPosition: SnackPosition.TOP);
+            Get.snackbar('提示', '跳转设置页面');
           }),
-          _buildBottomSheetItem('意见反馈', Icons.feedback, () {
-            Get.back();
-            Get.snackbar('提示', '跳转意见反馈页面', snackPosition: SnackPosition.TOP);
+          _buildBottomSheetItem('帮助与反馈', Icons.help_outline, () {
+            Get.snackbar('提示', '帮助功能开发中');
+          }),
+          _buildBottomSheetItem('关于我们', Icons.info_outline, () {
+            Get.snackbar('提示', '关于页面开发中');
           }),
           
-          h16,
-          
-          // 取消按钮
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: container.wFull.grey200.rounded8.mh16.pv12.child(
-              '取消'.text.black.f16.center.mk,
-            ),
-          ),
           h16,
         ]),
       ),
@@ -148,18 +140,15 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
       
       // 主体内容
       body: SingleChildScrollView(
-        child: column.children([
+        child: column.spacing16.children([
           // 封面和头像区域
           _buildHeaderSection(),
-          h16,
           
           // 用户信息区域
           _buildUserInfoSection(),
-          h16,
           
           // 统计数据区域
           _buildStatsSection(),
-          h16,
           
           // 操作按钮区域
           _buildActionButtonsSection(),
@@ -195,29 +184,24 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
 
   /// 构建用户信息区域
   Widget _buildUserInfoSection() {
-    return container.white.wFull.pt50.pb20.ph20.child(
-      column.crossStart.children([
-        // 昵称
-        userProfile['nickname'].toString().text.black.f20.bold.mk,
-        h4,
-        
-        // 用户名
-        '@${userProfile['username']}'.text.grey600.f14.mk,
-        h12,
-        
-        // 个人简介
-        userProfile['bio'].toString().text.black87.f16.mk,
-        h16,
-        
-        // 详细信息
-        wrap.spacing16.runSpacing8.children([
-          _buildInfoChip(Icons.cake, '生日', userProfile['birthday']),
-          _buildInfoChip(Icons.wc, '性别', userProfile['gender']),
-          _buildInfoChip(Icons.location_on, '位置', userProfile['location']),
-          _buildInfoChip(Icons.calendar_today, '加入时间', userProfile['joinDate']),
-        ]),
+    return column.white.wFull.pt50.pb20.ph20.crossStart.spacing12.children([
+      // 昵称
+      userProfile['nickname'].toString().text.black.f20.bold.mk,
+      
+      // 用户名
+      '@${userProfile['username']}'.text.grey600.f14.mk,
+      
+      // 个人简介
+      userProfile['bio'].toString().text.black87.f16.mk,
+      
+      // 详细信息
+      wrap.spacing16.runSpacing8.children([
+        _buildInfoChip(Icons.cake, '生日', userProfile['birthday']),
+        _buildInfoChip(Icons.wc, '性别', userProfile['gender']),
+        _buildInfoChip(Icons.location_on, '位置', userProfile['location']),
+        _buildInfoChip(Icons.calendar_today, '加入时间', userProfile['joinDate']),
       ]),
-    );
+    ]);
   }
 
   /// 构建信息标签
@@ -226,22 +210,19 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
   /// [label] 标签
   /// [value] 值
   Widget _buildInfoChip(IconData icon, String label, String value) {
-    return row.children([
+    return row.spacing4.children([
       icon.icon.grey600.s16.mk,
-      w4,
       '$label：$value'.text.grey600.f12.mk,
     ]);
   }
 
   /// 构建统计数据区域
   Widget _buildStatsSection() {
-    return container.white.wFull.pv20.child(
-      row.spaceEvenly.children([
-        _buildStatItem('动态', userProfile['postsCount'], _viewPosts),
-        _buildStatItem('关注', userProfile['followingCount'], _viewFollowing),
-        _buildStatItem('粉丝', userProfile['followersCount'], _viewFollowers),
-      ]),
-    );
+    return row.white.wFull.pv20.spaceEvenly.children([
+      _buildStatItem('动态', userProfile['postsCount'], _viewPosts),
+      _buildStatItem('关注', userProfile['followingCount'], _viewFollowing),
+      _buildStatItem('粉丝', userProfile['followersCount'], _viewFollowers),
+    ]);
   }
 
   /// 构建统计项
@@ -252,9 +233,8 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
   Widget _buildStatItem(String label, int count, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: column.center.children([
+      child: column.center.spacing4.children([
         count.toString().text.black.f18.bold.mk,
-        h4,
         label.text.grey600.f14.mk,
       ]),
     );
@@ -262,51 +242,45 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
 
   /// 构建操作按钮区域
   Widget _buildActionButtonsSection() {
-    return container.white.wFull.p20.child(
-      column.children([
-        // 编辑资料按钮
+    return column.white.wFull.p20.spacing12.children([
+      // 编辑资料按钮
+      GestureDetector(
+        onTap: _editProfile,
+        child: container.blue.rounded8.pv12.child(
+          row.center.spacing8.children([
+            Icons.edit.icon.white.s20.mk,
+            '编辑资料'.text.white.f16.mk,
+          ]),
+        ),
+      ),
+      
+      // 其他操作按钮
+      row.spacing12.children([
+        // 分享资料
         GestureDetector(
-          onTap: _editProfile,
-          child: container.wFull.blue.rounded8.pv12.child(
-            row.center.children([
-              Icons.edit.icon.white.s20.mk,
-              w8,
-              '编辑资料'.text.white.f16.mk,
+          onTap: _shareProfile,
+          child: container.expanded.border1.borderBlue.rounded8.pv12.child(
+            row.center.spacing8.children([
+              Icons.share.icon.blue.s20.mk,
+              '分享'.text.blue.f16.mk,
             ]),
           ),
         ),
-        h12,
         
-        // 其他操作按钮
-        row.children([
-          // 分享资料
-          GestureDetector(
-            onTap: _shareProfile,
-            child: container.expanded.border1.borderBlue.rounded8.pv12.mr6.child(
-              row.center.children([
-                Icons.share.icon.blue.s20.mk,
-                w8,
-                '分享'.text.blue.f16.mk,
-              ]),
-            ),
+        // 设置
+        GestureDetector(
+          onTap: () {
+            Get.snackbar('提示', '跳转设置页面', snackPosition: SnackPosition.TOP);
+          },
+          child: container.expanded.border1.borderGrey300.rounded8.pv12.child(
+            row.center.spacing8.children([
+              Icons.settings.icon.grey600.s20.mk,
+              '设置'.text.grey600.f16.mk,
+            ]),
           ),
-          
-          // 设置
-          GestureDetector(
-            onTap: () {
-              Get.snackbar('提示', '跳转设置页面', snackPosition: SnackPosition.TOP);
-            },
-            child: container.expanded.border1.borderGrey300.rounded8.pv12.ml6.child(
-              row.center.children([
-                Icons.settings.icon.grey600.s20.mk,
-                w8,
-                '设置'.text.grey600.f16.mk,
-              ]),
-            ),
-          ),
-        ]),
+        ),
       ]),
-    );
+    ]);
   }
 
   /// 构建底部弹窗选项
@@ -320,13 +294,10 @@ class _ProfilePageWidgetState extends State<ProfilePageWidget> {
         Get.back();
         onTap();
       },
-      child: container.wFull.pv16.ph20.child(
-        row.children([
-          icon.icon.grey600.s24.mk,
-          w16,
-          title.text.black.f16.mk,
-        ]),
-      ),
+      child: row.wFull.pv16.ph20.spacing16.children([
+        icon.icon.grey600.s24.mk,
+        title.text.black.f16.mk,
+      ]),
     );
   }
 } 
