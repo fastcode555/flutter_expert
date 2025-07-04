@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 /// 最后修改时间：2024-06-10
 class LocaleController extends GetxController {
   /// 当前语言
-  final Rx<LocaleModel> currentLocale = LocaleModel(languageCode: 'zh', countryCode: 'CN', name: '简体中文').obs;
+  final Rx<LocaleModel> currentLocale = const LocaleModel(languageCode: 'zh', countryCode: 'CN', name: '简体中文').obs;
 
   /// 切换语言
   /// [locale] 目标语言

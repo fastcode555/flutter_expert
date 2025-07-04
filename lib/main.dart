@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_expert/src/auth/widgets/login_widget.dart';
-import 'package:flutter_expert/src/chat/widgets/message_list_widget.dart';
+import 'package:flutter_expert/src/chat/pages/chat_demo_page.dart';
 import 'package:flutter_expert/src/feed/widgets/feed_list_widget.dart';
 import 'package:flutter_expert/src/friends/widgets/friend_list_widget.dart';
 import 'package:flutter_expert/src/notifications/widgets/notification_list_widget.dart';
@@ -101,60 +101,48 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: column.children([
+        child: column.spacing24.children([
           // 应用标题
           container.wFull.center.pv20.child(
-            column.center.children([
+            column.center.spacing16.children([
               container.s80.circle.blue100.center.child(
                 Icons.flutter_dash.icon.blue.s40.mk,
               ),
-              h16,
-              'Flutter Expert'.text.black.f24.bold.mk,
-              h8,
-              '使用 flutter_tailwind 重构的现代化应用'.text.grey600.f14.center.mk,
+              column.center.spacing8.children([
+                'Flutter Expert'.text.black.f24.bold.mk,
+                '使用 flutter_tailwind 重构的现代化应用'.text.grey600.f14.center.mk,
+              ]),
             ]),
           ),
-          
-          h24,
           
           // 功能模块网格
           _buildModuleGrid(),
           
-          h32,
-          
           // 应用信息
           container.white.rounded12.p16.cardShadow.child(
-            column.children([
+            column.spacing12.children([
               '重构成果'.text.black.f16.bold.mk,
-              h12,
-              row.children([
-                Icons.check_circle.icon.green.s16.mk,
-                w8,
-                '完成 Auth 模块重构'.text.black87.f14.mk,
-              ]),
-              h8,
-              row.children([
-                Icons.check_circle.icon.green.s16.mk,
-                w8,
-                '完成 Profile 模块重构'.text.black87.f14.mk,
-              ]),
-              h8,
-              row.children([
-                Icons.check_circle.icon.green.s16.mk,
-                w8,
-                '完成 Feed 模块重构'.text.black87.f14.mk,
-              ]),
-              h8,
-              row.children([
-                Icons.check_circle.icon.green.s16.mk,
-                w8,
-                '完成 Chat 模块重构'.text.black87.f14.mk,
-              ]),
-              h8,
-              row.children([
-                Icons.check_circle.icon.green.s16.mk,
-                w8,
-                '完成 Settings 模块重构'.text.black87.f14.mk,
+              column.spacing8.children([
+                row.spacing8.children([
+                  Icons.check_circle.icon.green.s16.mk,
+                  '完成 Auth 模块重构'.text.black87.f14.mk,
+                ]),
+                row.spacing8.children([
+                  Icons.check_circle.icon.green.s16.mk,
+                  '完成 Profile 模块重构'.text.black87.f14.mk,
+                ]),
+                row.spacing8.children([
+                  Icons.check_circle.icon.green.s16.mk,
+                  '完成 Feed 模块重构'.text.black87.f14.mk,
+                ]),
+                row.spacing8.children([
+                  Icons.check_circle.icon.green.s16.mk,
+                  '完成 Chat 模块重构'.text.black87.f14.mk,
+                ]),
+                row.spacing8.children([
+                  Icons.check_circle.icon.green.s16.mk,
+                  '完成 Settings 模块重构'.text.black87.f14.mk,
+                ]),
               ]),
             ]),
           ),
@@ -188,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'title': '聊天',
         'icon': Icons.chat,
         'color': Colors.purple,
-        'page': const MessageListWidget(),
+        'page': const ChatDemoPage(),
       },
       {
         'title': '好友列表',
@@ -210,17 +198,9 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     ];
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 1.2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemCount: modules.length,
-      itemBuilder: (context, index) {
+    return gridview.crossAxisCount2.spacing12.ratio(1.2).shrinkWrap.neverScroll.builder(
+      modules.length,
+      (context, index) {
         final module = modules[index];
         return _buildModuleCard(
           module['title']! as String,
@@ -244,14 +224,14 @@ class _MyHomePageState extends State<MyHomePage> {
         Get.to(() => page);
       },
       child: container.white.rounded12.cardShadow.child(
-        column.center.children([
+        column.center.spacing12.children([
           container.color(color.withOpacity(0.1)).s50.circle.center.child(
             icon.icon.color(color).s24.mk,
           ),
-          h12,
-          title.text.black87.f14.bold.center.mk,
-          h4,
-          '点击体验'.text.grey.f12.center.mk,
+          column.center.spacing4.children([
+            title.text.black87.f14.bold.center.mk,
+            '点击体验'.text.grey.f12.center.mk,
+          ]),
         ]),
       ),
     );

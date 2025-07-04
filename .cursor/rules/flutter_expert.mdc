@@ -45,24 +45,29 @@ alwaysApply: true
   - `lib/src/` 业务模块
   - `lib/common/` 公共组件、工具类
   - `lib/generated/` 自动生成代码
+  - `lib/res/` 静态资源（图片、字体、颜色等）
+  - `lib/widgets/` 全局共用UI 组件
   - 业务代码必须采用模块化组织，每个业务块单独建立文件夹（如 order、user、product 等），每个模块下再细分 model、controllers、widgets 等子目录。
   - 示例：
     ```
     lib/
-      src/
-        order/
-          models/
-            order_model.dart
-          controllers/
-            order_controller.dart
-          widgets/
-            order_card.dart
-        user/
-          models/
-          controllers/
-          widgets/
+      api/
+      page/
+         order/
+           models/
+             order_model.dart
+           controllers/
+             order_controller.dart
+           widgets/
+             order_card.dart
+         user/
+           models/
+           controllers/
+           widgets/
       common/
       generated/
+      res/
+      widgets/
     ```
   - 各业务模块下的 models、controllers、widgets 文件夹为必需，其他如 services、utils 可根据实际需要增设。
 - `assets/` 静态资源（图片、字体等）
@@ -164,6 +169,8 @@ alwaysApply: true
 ## 12. 检验交付（代码交付）
 - 交付之前需要在命令行运行之后，修复所有报错之后，再提醒用户，如果有问题，需要一直解决问题
 - 需要执行 'fvm dart analyze' 分析报错问题，然后再执行 'fvm dart fix --apply'修复问题
+- 需要检查代码是否遵循了 flutter_tailwind，如果不遵循，需要进行重构，再次验证
+- 最后再执行'fvm flutter run'来执行代码，跑起来，验证代码是否会出现overflow的越界问题，还有其它报错，需要修复报错，直到没有问题为止
 ---
 
 如有疑问或建议，请联系项目维护者。

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expert/src/chat/models/conversation_model.dart';
 import 'package:flutter_tailwind/flutter_tailwind.dart';
 import 'package:get/get.dart';
 
@@ -11,7 +12,13 @@ import 'package:get/get.dart';
 /// 作者：AI助手
 /// 最后修改时间：2024-12-19
 class MessageListWidget extends StatefulWidget {
-  const MessageListWidget({super.key});
+  /// 会话数据
+  final ConversationModel? conversation;
+
+  const MessageListWidget({
+    super.key,
+    this.conversation,
+  });
 
   @override
   State<MessageListWidget> createState() => _MessageListWidgetState();
@@ -68,6 +75,13 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         'timestamp': DateTime.now().subtract(const Duration(minutes: 20)),
         'type': 'text',
       },
+      {
+        'id': '6',
+        'content': widget.conversation?.lastMessage ?? '好的，没问题！',
+        'isMe': false,
+        'timestamp': widget.conversation?.lastMessageTime ?? DateTime.now().subtract(const Duration(minutes: 5)),
+        'type': 'text',
+      },
     ]);
   }
 
@@ -109,14 +123,19 @@ class _MessageListWidgetState extends State<MessageListWidget> {
           onTap: Get.back,
           child: Icons.arrow_back_ios.icon.black.s20.mk,
         ),
-        title: row.children([
+        title: row.spacing12.children([
           container.s40.circle.grey200.child(
-            Icons.person.icon.grey600.s20.mk,
+            widget.conversation?.avatarUrl.isNotEmpty == true
+                ? widget.conversation!.avatarUrl.image.s40.circle.cover.mk
+                : Icons.person.icon.grey600.s20.mk,
           ),
-          w12,
-          column.children([
-            '好友昵称'.text.black.f16.bold.mk,
-            '在线'.text.green.f12.mk,
+          column.crossStart.children([
+            (widget.conversation?.nickname ?? '好友昵称').text.black.f16.bold.mk,
+            (widget.conversation?.isOnline == true ? '在线' : '离线')
+                .text
+                .color(widget.conversation?.isOnline == true ? Colors.green : Colors.grey)
+                .f12
+                .mk,
           ]),
         ]),
         actions: [
@@ -136,14 +155,12 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         Expanded(
           child: _messages.isEmpty
               ? _buildEmptyState()
-              : listview
-                  .scrollController(_scrollController)
-                  .pv16
-                  .ph8
-                  .dataBuilder<Map<String, dynamic>>(
-                    _messages,
-                    (context, index, message) => _buildMessageBubble(message),
-                  ),
+              : ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
+                ),
         ),
         // 输入框
         _buildMessageInput(),
@@ -153,12 +170,10 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
   /// 构建空状态
   Widget _buildEmptyState() {
-    return container.wFull.hFull.center.child(
-      column.center.children([
+    return Center(
+      child: column.center.spacing16.children([
         Icons.chat_bubble_outline.icon.grey400.s64.mk,
-        h16,
         '开始聊天吧'.text.grey600.f16.mk,
-        h8,
         '发送一条消息破冰'.text.grey400.f14.mk,
       ]),
     );
@@ -172,13 +187,17 @@ class _MessageListWidgetState extends State<MessageListWidget> {
     final content = message['content'] as String;
     final timestamp = message['timestamp'] as DateTime;
 
-    return container.wFull.mb12.child(
-      row.children([
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      child: row.children([
         if (!isMe) ...[
           container.s32.circle.grey200.child(
-            Icons.person.icon.grey600.s16.mk,
+            widget.conversation?.avatarUrl.isNotEmpty == true
+                ? widget.conversation!.avatarUrl.image.s32.circle.cover.mk
+                : Icons.person.icon.grey600.s16.mk,
           ),
-          w8,
+          const SizedBox(width: 8),
         ],
         if (isMe) const Spacer(),
         
@@ -190,12 +209,11 @@ class _MessageListWidgetState extends State<MessageListWidget> {
               .p12
               .cardShadow
               .child(
-            column.children([
+            column.crossStart.spacing4.children([
               content.text
                   .color(isMe ? Colors.white : Colors.black87)
                   .f14
                   .mk,
-              h4,
               '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}'
                   .text
                   .color(isMe ? Colors.white70 : Colors.grey)
@@ -207,9 +225,9 @@ class _MessageListWidgetState extends State<MessageListWidget> {
         
         if (!isMe) const Spacer(),
         if (isMe) ...[
-          w8,
-          container.s32.circle.blue100.child(
-            Icons.person.icon.blue.s16.mk,
+          const SizedBox(width: 8),
+          container.s32.circle.blue200.child(
+            Icons.person.icon.blue800.s16.mk,
           ),
         ],
       ]),
@@ -218,36 +236,32 @@ class _MessageListWidgetState extends State<MessageListWidget> {
 
   /// 构建消息输入框
   Widget _buildMessageInput() {
-    final inputController = TextEditingController();
-
-    return container.white.p16.child(
-      row.children([
+    final controller = TextEditingController();
+    
+    return container.white.p16.borderT1.borderGrey200.child(
+      row.crossEnd.spacing12.children([
         // 输入框
         Expanded(
-          child: container.grey100.rounded20.ph16.pv8.child(
+          child: container.h40.rounded20.grey100.p12.child(
             TextField(
-              controller: inputController,
+              controller: controller,
+              maxLines: null,
               decoration: const InputDecoration(
                 hintText: '输入消息...',
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
-              style: const TextStyle(fontSize: 14),
-              onSubmitted: (value) {
-                _sendMessage(value);
-                inputController.clear();
-              },
             ),
           ),
         ),
-        w12,
+        
         // 发送按钮
         GestureDetector(
           onTap: () {
-            _sendMessage(inputController.text);
-            inputController.clear();
+            _sendMessage(controller.text);
+            controller.clear();
           },
-          child: container.blue.circle.p8.child(
+          child: container.s40.circle.blue.center.child(
             Icons.send.icon.white.s20.mk,
           ),
         ),

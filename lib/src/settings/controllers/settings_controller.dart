@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 /// 最后修改时间：2024-06-10
 class SettingsController extends GetxController {
   /// 当前设置
-  Rx<SettingsModel> settings = SettingsModel(
+  Rx<SettingsModel> settings = const SettingsModel(
     notificationEnabled: true,
     privacyEnabled: false,
     language: 'zh',

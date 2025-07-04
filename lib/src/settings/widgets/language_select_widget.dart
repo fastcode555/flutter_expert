@@ -22,9 +22,9 @@ class LanguageSelectWidget extends StatefulWidget {
 class _LanguageSelectWidgetState extends State<LanguageSelectWidget> {
   /// 支持的语言列表
   final List<LocaleModel> languages = [
-    LocaleModel(languageCode: 'zh', countryCode: 'CN', name: '简体中文'),
-    LocaleModel(languageCode: 'en', countryCode: 'US', name: 'English'),
-    LocaleModel(languageCode: 'es', countryCode: 'ES', name: 'Español'),
+    const LocaleModel(languageCode: 'zh', countryCode: 'CN', name: '简体中文'),
+    const LocaleModel(languageCode: 'en', countryCode: 'US', name: 'English'),
+    const LocaleModel(languageCode: 'es', countryCode: 'ES', name: 'Español'),
   ];
 
   /// 切换语言
