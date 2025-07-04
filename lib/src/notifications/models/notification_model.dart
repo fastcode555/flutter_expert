@@ -1,3 +1,5 @@
+import 'package:json2dart_safe/json2dart.dart';
+
 /// 通知数据模型
 ///
 /// 用于存储和传递通知相关数据。
@@ -17,7 +19,7 @@ class NotificationModel {
   /// 是否已读
   final bool isRead;
 
-  NotificationModel({
+  const NotificationModel({
     required this.id,
     required this.type,
     required this.content,
@@ -25,9 +27,31 @@ class NotificationModel {
     required this.isRead,
   });
 
-  /// 创建模型副本
-  ///
-  /// 可以选择性地更新特定字段
+  /// 必须方法：fromJson - JSON反序列化
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      id: json.asString('id'),
+      type: json.asString('type'),
+      content: json.asString('content'),
+      timestamp: json.asInt('timestamp') != 0
+          ? DateTime.fromMillisecondsSinceEpoch(json.asInt('timestamp'))
+          : DateTime.now(),
+      isRead: json.asBool('isRead'),
+    );
+  }
+
+  /// 必须方法：toJson - JSON序列化
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'content': content,
+      'timestamp': timestamp.millisecondsSinceEpoch,
+      'isRead': isRead,
+    };
+  }
+
+  /// 必须方法：copyWith - 不可变对象更新
   NotificationModel copyWith({
     String? id,
     String? type,
@@ -42,27 +66,5 @@ class NotificationModel {
       timestamp: timestamp ?? this.timestamp,
       isRead: isRead ?? this.isRead,
     );
-  }
-
-  /// 从 JSON 创建模型实例
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
-    return NotificationModel(
-      id: json['id'] as String,
-      type: json['type'] as String,
-      content: json['content'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-      isRead: json['isRead'] as bool,
-    );
-  }
-
-  /// 转换为 JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type,
-      'content': content,
-      'timestamp': timestamp.toIso8601String(),
-      'isRead': isRead,
-    };
   }
 } 

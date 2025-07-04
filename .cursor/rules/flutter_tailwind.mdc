@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Flutter Tailwind 开发规则
 
 ## 概述

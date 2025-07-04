@@ -211,6 +211,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  json2dart_safe:
+    dependency: "direct main"
+    description:
+      name: json2dart_safe
+      sha256: "8dca88bac9ee82c4adeeaa430586d3c326a25ea6ee7aa25dba5da63a358ee55f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   leak_tracker:
     dependency: transitive
     description:

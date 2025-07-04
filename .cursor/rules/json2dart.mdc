@@ -1,0 +1,1232 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# JSON2Dart 安全解析插件文档
+
+## 🚨 重要编码规范
+
+### 📌 规则 1：默认值使用原则
+**只有当用户明确指出要添加默认值时，才需要添加默认值。如果没有特别说明，默认是不加默认值的。**
+
+### 📌 规则 2：条件性 Map 字段添加规范
+**禁止使用先创建 Map 再单独添加字段的方式，应该直接在 Map 字面量中使用条件语法。**
+
+### 📌 规则 3：基础类型非空声明
+**基础类型（String、bool、double、int、num等）应该定义成非nullable类型，因为解析方法默认会返回相应的默认值。**
+
+### 📌 规则 4：模型解析函数引用
+**在解析模型时，应该直接传递构造函数引用，而不是使用 lambda 表达式。**
+
+### 📌 规则 5：多字段解析使用原则
+**只有当用户明确指出要使用多字段解析时，才使用多字段解析方法。如果没有明确说明，保持使用单字段解析。**
+
+### 📌 规则 6：模型类必备方法规范
+**所有模型类必须包含 fromJson、toJson 和 copyWith 三个方法，确保完整的序列化、反序列化和不可变对象更新能力。**
+**所有的代码必须基于json2dart_safe编写，具体查看下面的示例**
+
+```dart
+// ❌ 错误写法
+final data = {'success': success, 'message': message};
+if (token != null) data['token'] = token!;
+
+// ✅ 正确写法
+final data = {
+  'success': success,
+  'message': message,
+  if (token != null) 'token': token,
+};
+
+// 📌 多字段解析示例
+// ✅ 正确：用户明确要求时使用
+final userName = json.asStrings(['username', 'name', 'displayName']);
+
+// ❌ 错误：没有明确需求就使用多字段解析
+final name = json.asStrings(['name']);  // 应该用 json.asString('name')
+
+// 📌 模型类必备方法
+class User {
+  final String name;
+  User({required this.name});
+
+  // 必须：JSON反序列化
+  factory User.fromJson(Map<String, dynamic> json) => User(name: json.asString('name'));
+
+  // 必须：JSON序列化
+  Map<String, dynamic> toJson() => {'name': name};
+
+  // 必须：不可变对象更新
+  User copyWith({String? name}) => User(name: name ?? this.name);
+}
+```
+
+### 📌 规则 3：基础类型非空声明规范
+**基础类型（String、bool、double、int、num等）应该定义成非nullable类型，因为解析方法默认会返回相应的默认值。**
+
+```dart
+// ✅ 正确：基础类型使用非空声明
+class User {
+  final String name;        // 非空，因为 asString 返回默认空字符串
+  final int age;           // 非空，因为 asInt 返回默认 0
+  final bool isActive;     // 非空，因为 asBool 返回默认 false
+  final double score;      // 非空，因为 asDouble 返回默认 0.0
+
+  // 复杂类型使用可空声明
+  final UserProfile? profile;  // 可空，因为 asBean 可能返回 null
+  final List<String>? tags;    // 可空，因为 asList 可能返回 null
+}
+```
+
+### 📌 规则 4：模型解析函数引用规范
+**在解析模型时，应该直接传递构造函数引用，利用 Dart 的高级特性，而不是使用 lambda 表达式。**
+
+```dart
+// ✅ 正确写法：直接传递构造函数引用
+final user = json.asBean<User>('user', User.fromJson);
+final users = json.asList<User>('users', User.fromJson);
+
+// ❌ 错误写法：使用不必要的 lambda 表达式
+final user = json.asBean<User>('user', (json) => User.fromJson(json));
+final users = json.asList<User>('users', (json) => User.fromJson(json));
+```
+
+### 📌 规则 5：多字段解析使用原则
+**只有当用户明确指出要使用多字段解析时，才使用多字段解析方法（asStrings、asInts、asBools等）。如果没有明确说明，保持使用单字段解析。**
+
+```dart
+// ✅ 正确：默认使用单字段解析
+final name = json.asString('name');
+final age = json.asInt('age');
+final isActive = json.asBool('isActive');
+
+// ✅ 正确：用户明确要求多字段解析时
+// 用户说："尝试从 username、name、displayName 字段中获取用户名"
+final userName = json.asStrings(['username', 'name', 'displayName']);
+
+// ❌ 错误：自动使用多字段解析
+final name = json.asStrings(['name']);  // 不必要的多字段解析
+```
+
+## 📖 编码规则深度解析
+
+### 🔍 规则 3 深度解析：基础类型的默认值机制
+
+json2dart_safe 库为每种基础类型提供了内置的默认值：
+
+| 类型 | 默认值 | 说明 |
+|------|-------|------|
+| `String` | `''` (空字符串) | 确保字符串操作的安全性 |
+| `int` | `0` | 数值计算的中性元素 |
+| `double` | `0.0` | 浮点计算的中性元素 |
+| `bool` | `false` | 布尔逻辑的安全默认值 |
+| `num` | `0` | 数值类型的通用默认值 |
+
+**为什么基础类型应该非空？**
+
+```dart
+// ✅ 推荐做法：利用内置默认值机制
+class Product {
+  final String name;        // 永远不会是 null，最差情况是空字符串
+  final double price;       // 永远不会是 null，最差情况是 0.0
+  final bool available;     // 永远不会是 null，最差情况是 false
+
+  Product({
+    required this.name,
+    required this.price,
+    required this.available,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      name: json.asString('name'),        // 自动处理 null -> ''
+      price: json.asDouble('price'),      // 自动处理 null -> 0.0
+      available: json.asBool('available'), // 自动处理 null -> false
+    );
+  }
+}
+
+// ❌ 不必要的复杂性
+class ProductBad {
+  final String? name;       // 增加了不必要的 null 检查负担
+  final double? price;      // 需要额外的 null 处理逻辑
+  final bool? available;    // 使用时需要 ?? 操作符
+}
+```
+
+### 🔍 规则 4 深度解析：函数引用 vs Lambda 表达式
+
+**函数引用的优势：**
+
+1. **性能优化**：避免了额外的函数调用开销
+2. **代码简洁**：减少了样板代码
+3. **类型推导**：更好的编译时类型检查
+4. **内存效率**：函数引用是编译时常量
+
+```dart
+// ✅ 函数引用：编译时优化，零开销抽象
+final user = json.asBean<User>('user', User.fromJson);
+final users = json.asList<User>('users', User.fromJson);
+
+// ❌ Lambda 表达式：运行时创建闭包，额外开销
+final user = json.asBean<User>('user', (json) => User.fromJson(json));
+final users = json.asList<User>('users', (json) => User.fromJson(json));
+```
+
+**适用场景对比：**
+
+```dart
+// ✅ 标准场景：直接使用构造函数引用
+final articles = json.asList<Article>('articles', Article.fromJson);
+
+// ✅ 需要额外处理时：使用 lambda 表达式
+final articles = json.asList<Article>('articles', (json) {
+  // 添加额外的验证或处理逻辑
+  if (json.asString('status') == 'deleted') {
+    return null; // 过滤已删除的文章
+  }
+  return Article.fromJson(json);
+});
+
+// ✅ 复杂映射场景：使用 lambda 表达式
+final processedData = json.asList<ProcessedItem>('items', (json) {
+  final item = RawItem.fromJson(json);
+  return ProcessedItem.fromRawItem(item); // 需要额外转换步骤
+});
+```
+
+### 💡 最佳实践综合示例
+
+```dart
+class CompleteExample {
+  // 基础类型：非空声明（规则3）
+  final String title;
+  final int viewCount;
+  final bool published;
+  final double rating;
+
+  // 复杂类型：可空声明
+  final User? author;
+  final List<Comment>? comments;
+  final Map<String, dynamic>? metadata;
+
+  CompleteExample({
+    required this.title,
+    required this.viewCount,
+    required this.published,
+    required this.rating,
+    this.author,
+    this.comments,
+    this.metadata,
+  });
+
+  factory CompleteExample.fromJson(Map<String, dynamic> json) {
+    return CompleteExample(
+      // 基础类型自动获得默认值（规则3）
+      title: json.asString('title'),
+      viewCount: json.asInt('view_count'),
+      published: json.asBool('published'),
+      rating: json.asDouble('rating'),
+
+      // 使用构造函数引用（规则4）
+      author: json.asBean<User>('author', User.fromJson),
+      comments: json.asList<Comment>('comments', Comment.fromJson),
+
+      // 直接赋值复杂类型
+      metadata: json['metadata'] as Map<String, dynamic>?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    // 使用条件语法（规则2）
+    return {
+      'title': title,
+      'view_count': viewCount,
+      'published': published,
+      'rating': rating,
+      if (author != null) 'author': author!.toJson(),
+      if (comments?.isNotEmpty == true) 'comments': comments!.map((c) => c.toJson()).toList(),
+      if (metadata?.isNotEmpty == true) 'metadata': metadata,
+    };
+  }
+}
+```
+
+---
+
+## 项目概述
+
+**json2dart_safe** 是一个专为 Flutter/Dart 设计的 JSON 安全解析库，提供空安全特性和默认值处理。该插件旨在解决 JSON 数据解析过程中常见的类型不匹配、空值处理等问题，确保应用程序的稳定性。
+
+## 核心模块
+
+### 1. Json2Dart 单例管理器
+
+**位置**: `lib/src/json2dart.dart`
+
+**功能**: 提供全局错误回调管理
+
+```dart
+class Json2Dart {
+  static Json2Dart get instance => _getInstance();
+
+  // 添加简单错误回调
+  void addCallback(Function(String) callBack);
+
+  // 添加详细错误回调（包含方法名、键名、原始数据）
+  void addDetailCallback(Function(String method, String key, Map? map) callBack);
+}
+```
+
+**使用示例**:
+```dart
+Json2Dart.instance.addCallback((error) {
+  print('JSON解析错误: $error');
+});
+
+Json2Dart.instance.addDetailCallback((method, key, map) {
+  print('方法: $method, 键: $key, 数据: $map');
+});
+```
+
+### 2. JsonFormatter 格式化工具
+
+**位置**: `lib/src/json_formatter.dart`
+
+**功能**: 提供 JSON 数据的格式化输出
+
+```dart
+class JsonFormatter {
+  static String format(
+    dynamic data, {
+    int deep = 0,
+    String indentation = '  ',
+    String key = '',
+  });
+}
+```
+
+**特性**:
+- 支持嵌套对象和数组的格式化
+- 可自定义缩进字符和层级
+- 自动处理不同数据类型的格式化
+
+**使用示例**:
+```dart
+var jsonData = {'name': 'Flutter', 'version': '3.0'};
+String formatted = JsonFormatter.format(jsonData);
+print(formatted);
+```
+
+### 3. 核心扩展方法 (MapExt)
+
+**位置**: `lib/src/json_parse_utils.dart`
+
+这是库的核心，为 `Map?` 类型提供了丰富的安全解析扩展方法。
+
+## 数据类型解析方法
+
+### 字符串解析
+
+```dart
+// 单字段解析
+String asString(String key, [String? defValue]);
+
+// 多字段解析（仅当用户明确要求时使用）
+String asStrings(List<String> keys, [String? defValue]);
+```
+
+**使用示例**:
+```dart
+Map<String, dynamic> json = {'name': 'Flutter', 'title': null};
+
+// 基础类型使用非空声明（遵循规则3）
+String name = json.asString('name');        // 'Flutter'
+String title = json.asString('title');      // '' (空字符串默认值)
+
+// 只有在用户明确要求时才添加自定义默认值（遵循规则1）
+String nameWithDefault = json.asString('name', '默认名称');        // 'Flutter'
+String titleWithDefault = json.asString('title', '默认标题');      // '默认标题'
+
+// 只有在用户明确要求多字段解析时才使用（遵循规则5）
+// 例如：用户说"从title或name字段中获取显示文本"
+String displayText = json.asStrings(['title', 'name'], '无');     // 'Flutter'
+```
+
+### 数值解析
+
+```dart
+// 整数解析
+int asInt(String key, [int? defValue]);
+int asInts(List<String> keys, [int? defValue]);  // 仅当用户明确要求时使用
+
+// 浮点数解析
+double asDouble(String key, [double? defValue]);
+double asDoubles(List<String> keys, [double? defValue]);  // 仅当用户明确要求时使用
+
+// 数值解析（自动判断 int/double）
+num asNum(String key);
+```
+
+**使用示例**:
+```dart
+Map<String, dynamic> json = {
+  'age': '25',
+  'price': '99.99',
+  'count': null
+};
+
+// 基础类型使用非空声明（遵循规则3）
+int age = json.asInt('age');           // 25
+double price = json.asDouble('price'); // 99.99
+int count = json.asInt('count');       // 0 (默认值)
+
+// 只有在用户明确要求时才添加自定义默认值（遵循规则1）
+int countWithDefault = json.asInt('count', 1);       // 1 (明确要求的默认值)
+```
+
+### 布尔值解析
+
+```dart
+// 单字段布尔解析
+bool asBool(String key, [bool? defValue]);
+
+// 多字段布尔解析（仅当用户明确要求时使用）
+bool asBools(List<String> keys, [bool? defValue]);
+```
+
+**智能转换规则**:
+- `true`, `'true'`, `1`, `'1'` → `true`
+- `false`, `'false'`, `0`, `'0'` → `false`
+- `null` 或其他值 → 使用默认值
+
+**使用示例**:
+```dart
+Map<String, dynamic> json = {
+  'isActive': 'true',
+  'isVisible': 1,
+  'isEnabled': false,
+  'isHidden': null
+};
+
+// 基础类型使用非空声明（遵循规则3）
+bool active = json.asBool('isActive');    // true
+bool visible = json.asBool('isVisible');  // true
+bool enabled = json.asBool('isEnabled');  // false
+bool hidden = json.asBool('isHidden');    // false (默认值)
+
+// 只有在用户明确要求时才添加自定义默认值（遵循规则1）
+bool activeWithDefault = json.asBool('isActive', true);   // true
+```
+
+## 复杂数据结构解析
+
+### 列表解析
+
+```dart
+// 基础列表解析
+List<T>? asList<T>(String key, [Function(Map json)? toBean]);
+
+// 多字段列表解析（仅当用户明确要求时使用）
+List<T>? asLists<T>(List<String> keys, [Function(Map json)? toBean]);
+
+// 二维数组解析
+List<List<T>>? asArray2d<T>(String key, [Function(Map json)? toBean]);
+```
+
+**使用示例**:
+```dart
+// 基础类型列表
+Map<String, dynamic> json = {
+  'numbers': [1, 2, 3],
+  'names': ['A', 'B', 'C']
+};
+
+List<int>? numbers = json.asList<int>('numbers');
+List<String>? names = json.asList<String>('names');
+
+// 对象列表（遵循规则4：使用构造函数引用）
+Map<String, dynamic> jsonWithObjects = {
+  'users': [
+    {'name': 'Alice', 'age': 25},
+    {'name': 'Bob', 'age': 30}
+  ]
+};
+
+List<User>? users = jsonWithObjects.asList<User>('users', User.fromJson);
+```
+
+### 自定义模型解析
+
+```dart
+// 单个模型解析
+T? asBean<T>(String key, Function(Map json) toBean);
+
+// 多字段模型解析（仅当用户明确要求时使用）
+T? asBeans<T>(List<String> keys, Function(Map json) toBean);
+```
+
+**使用示例**:
+```dart
+class User {
+  final String name;    // 非空类型（遵循规则3）
+  final int age;        // 非空类型（遵循规则3）
+
+  const User({required this.name, required this.age});
+
+  // 必须方法：fromJson（遵循规则6）
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json.asString('name'),     // 基础类型不需要默认值
+      age: json.asInt('age'),          // 基础类型不需要默认值
+    );
+  }
+
+  // 必须方法：toJson（遵循规则6）
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'age': age,
+    };
+  }
+
+  // 必须方法：copyWith（遵循规则6）
+  User copyWith({String? name, int? age}) {
+    return User(
+      name: name ?? this.name,
+      age: age ?? this.age,
+    );
+  }
+}
+
+Map<String, dynamic> json = {
+  'user': {'name': 'Alice', 'age': 25}
+};
+
+// 使用构造函数引用（遵循规则4）
+User? user = json.asBean<User>('user', User.fromJson);
+```
+
+## 工具方法
+
+### Map 操作方法
+
+```dart
+// 安全添加键值对
+Map put(String key, Object? value);
+
+// 移除 null 值
+void removeNull();
+
+// 移除 null 或空字符串
+void removeNullOrEmpty();
+```
+
+**使用示例**:
+```dart
+Map<String, dynamic> data = {'name': 'Flutter', 'version': null, 'desc': ''};
+
+data.removeNull();        // 移除 version
+data.removeNullOrEmpty(); // 移除 version 和 desc
+data.put('type', 'framework'); // 安全添加
+```
+
+## 错误处理机制
+
+### 全局错误监听
+
+```dart
+// 设置全局错误回调
+Json2Dart.instance.addCallback((error) {
+  // 处理解析错误
+  print('解析错误: $error');
+});
+
+// 设置详细错误回调
+Json2Dart.instance.addDetailCallback((method, key, map) {
+  // 记录详细错误信息
+  print('方法: $method, 键: $key');
+  print('原始数据: $map');
+});
+```
+
+### 容错机制
+
+所有解析方法都具备以下容错特性：
+
+1. **类型自动转换**: 字符串数字自动转换为对应类型
+2. **默认值处理**: null 或解析失败时返回指定默认值
+3. **异常捕获**: 内部异常不会导致应用崩溃
+4. **错误回调**: 解析错误会触发全局回调通知
+
+## 重要编码规则详解
+
+### ⚠️ 关键规则 1：默认值使用原则
+
+**只有当用户明确指出要添加默认值时，才需要添加默认值。如果没有特别说明，默认是不加默认值的。**
+
+```dart
+// ❌ 错误：自动添加默认值
+factory User.fromJson(Map<String, dynamic> json) {
+  return User(
+    name: json.asString('name', '未知用户'),    // 不应该自动添加默认值
+    age: json.asInt('age', 0),               // 不应该自动添加默认值
+  );
+}
+
+// ✅ 正确：只在必要时使用默认值
+factory User.fromJson(Map<String, dynamic> json) {
+  return User(
+    name: json.asString('name'),    // 不添加默认值
+    age: json.asInt('age'),         // 不添加默认值
+  );
+}
+
+// ✅ 正确：用户明确要求默认值时
+factory User.fromJson(Map<String, dynamic> json) {
+  return User(
+    // 用户明确说："如果没有name字段，使用'匿名用户'作为默认值"
+    name: json.asString('name', '匿名用户'),
+    age: json.asInt('age'),
+  );
+}
+```
+
+### ⚠️ 关键规则 2：条件性 Map 字段添加
+
+**禁止使用先创建 Map 再单独添加字段的方式，应该直接在 Map 字面量中使用条件语法。**
+
+```dart
+// ❌ 错误写法：先创建 Map 再条件添加
+final data = {
+  'success': success,
+  'message': message,
+};
+if (token != null) {
+  data['token'] = token!;
+}
+
+// ✅ 正确写法：直接在 Map 字面量中使用条件语法
+final data = {
+  'success': success,
+  'message': message,
+  if (token != null) 'token': token,
+};
+```
+
+**更多条件语法示例：**
+
+```dart
+// 多个条件字段
+final requestData = {
+  'userId': userId,
+  'action': action,
+  if (params != null) 'params': params,
+  if (timestamp != null) 'timestamp': timestamp,
+  if (signature != null) 'signature': signature,
+};
+
+// 复杂条件
+final userProfile = {
+  'name': name,
+  'email': email,
+  if (age != null && age! > 0) 'age': age,
+  if (avatar?.isNotEmpty == true) 'avatar': avatar,
+  if (preferences?.isNotEmpty == true) 'preferences': preferences,
+};
+
+// List 中的条件元素
+final menuItems = [
+  'home',
+  'profile',
+  if (isAdmin) 'admin',
+  if (hasPermission('settings')) 'settings',
+];
+```
+
+### 🔍 规则 5 深度解析：多字段解析的使用时机
+
+**何时使用多字段解析？**
+
+多字段解析方法（`asStrings`、`asInts`、`asBools`等）应该仅在以下明确的业务场景中使用：
+
+1. **API 版本兼容性**：不同版本使用不同字段名
+2. **多数据源合并**：多个字段可能包含相同含义的数据
+3. **字段名历史变更**：旧字段名到新字段名的过渡期
+
+```dart
+// ✅ 正确场景1：API版本兼容
+class ApiCompatibilityUser {
+  final String userId;
+
+  const ApiCompatibilityUser({required this.userId});
+
+  factory ApiCompatibilityUser.fromJson(Map<String, dynamic> json) {
+    return ApiCompatibilityUser(
+      // v1 API 使用 'user_id'，v2 API 使用 'id'，v3 API 使用 'userId'
+      userId: json.asStrings(['userId', 'id', 'user_id']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'userId': userId};
+  }
+
+  ApiCompatibilityUser copyWith({String? userId}) {
+    return ApiCompatibilityUser(userId: userId ?? this.userId);
+  }
+}
+
+// ✅ 正确场景2：多数据源
+class ProductSearch {
+  final String productName;
+
+  const ProductSearch({required this.productName});
+
+  factory ProductSearch.fromJson(Map<String, dynamic> json) {
+    return ProductSearch(
+      // 商品名可能来自 title、name、product_name 等不同字段
+      productName: json.asStrings(['title', 'name', 'product_name']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'productName': productName};
+  }
+
+  ProductSearch copyWith({String? productName}) {
+    return ProductSearch(productName: productName ?? this.productName);
+  }
+}
+
+// ❌ 错误场景：没有明确的业务需求就使用多字段解析
+class SimpleUser {
+  final String name;
+
+  const SimpleUser({required this.name});
+
+  factory SimpleUser.fromJson(Map<String, dynamic> json) {
+    return SimpleUser(
+      // 没有业务需求，不应该使用多字段解析
+      name: json.asString('name'),  // 而不是 json.asStrings(['name'])
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name};
+  }
+
+  SimpleUser copyWith({String? name}) {
+    return SimpleUser(name: name ?? this.name);
+  }
+}
+
+// ✅ 默认标准做法：单字段解析
+class StandardUser {
+  final String name;
+  final int age;
+  final bool isActive;
+
+  const StandardUser({
+    required this.name,
+    required this.age,
+    required this.isActive,
+  });
+
+  factory StandardUser.fromJson(Map<String, dynamic> json) {
+    return StandardUser(
+      name: json.asString('name'),        // 单字段解析
+      age: json.asInt('age'),            // 单字段解析
+      isActive: json.asBool('isActive'), // 单字段解析
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'age': age,
+      'isActive': isActive,
+    };
+  }
+
+  StandardUser copyWith({String? name, int? age, bool? isActive}) {
+    return StandardUser(
+      name: name ?? this.name,
+      age: age ?? this.age,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+}
+```
+
+**多字段解析的优先级原则：**
+
+多字段解析按数组顺序依次尝试，返回第一个非空值：
+
+```dart
+// 优先级：username > name > displayName > 默认值
+final name = json.asStrings(['username', 'name', 'displayName'], 'Anonymous');
+
+// 实际解析逻辑：
+// 1. 先尝试 username，如果有值且非空，返回 username
+// 2. 再尝试 name，如果有值且非空，返回 name
+// 3. 最后尝试 displayName，如果有值且非空，返回 displayName
+// 4. 都没有值时，返回默认值 'Anonymous'
+```
+
+### 🔍 规则 6 深度解析：模型类必备方法
+
+**为什么模型类需要这三个方法？**
+
+1. **fromJson**：JSON 数据反序列化，将 Map 转换为 Dart 对象
+2. **toJson**：JSON 数据序列化，将 Dart 对象转换为 Map
+3. **copyWith**：不可变对象更新，创建属性部分修改的新实例
+
+**完整的模型类模板：**
+
+```dart
+class User {
+  final String name;
+  final int age;
+  final bool isActive;
+  final UserProfile? profile;
+  final List<String>? tags;
+
+  const User({
+    required this.name,
+    required this.age,
+    required this.isActive,
+    this.profile,
+    this.tags,
+  });
+
+  // 必须方法1：fromJson - JSON 反序列化
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json.asString('name'),
+      age: json.asInt('age'),
+      isActive: json.asBool('isActive'),
+      profile: json.asBean<UserProfile>('profile', UserProfile.fromJson),
+      tags: json.asList<String>('tags'),
+    );
+  }
+
+  // 必须方法2：toJson - JSON 序列化
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'age': age,
+      'isActive': isActive,
+      if (profile != null) 'profile': profile!.toJson(),
+      if (tags?.isNotEmpty == true) 'tags': tags,
+    };
+  }
+
+  // 必须方法3：copyWith - 不可变对象更新
+  User copyWith({
+    String? name,
+    int? age,
+    bool? isActive,
+    UserProfile? profile,
+    List<String>? tags,
+  }) {
+    return User(
+      name: name ?? this.name,
+      age: age ?? this.age,
+      isActive: isActive ?? this.isActive,
+      profile: profile ?? this.profile,
+      tags: tags ?? this.tags,
+    );
+  }
+
+  // 可选：重写 toString, hashCode, == 等方法
+  @override
+  String toString() {
+    return 'User(name: $name, age: $age, isActive: $isActive, profile: $profile, tags: $tags)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is User &&
+        other.name == name &&
+        other.age == age &&
+        other.isActive == isActive &&
+        other.profile == profile &&
+        listEquals(other.tags, tags);
+  }
+
+  @override
+  int get hashCode => Object.hash(name, age, isActive, profile, tags);
+}
+```
+
+**copyWith 方法的高级用法：**
+
+```dart
+// 基础用法：更新单个属性
+final user = User(name: 'Alice', age: 25, isActive: true);
+final updatedUser = user.copyWith(age: 26);
+
+// 复杂用法：条件性更新
+final userWithUpdatedProfile = user.copyWith(
+  profile: user.profile?.copyWith(avatar: newAvatar) ??
+           UserProfile(avatar: newAvatar),
+);
+
+// 批量更新
+final fullyUpdatedUser = user.copyWith(
+  name: 'Alice Smith',
+  age: 26,
+  isActive: false,
+  tags: ['flutter', 'developer'],
+);
+
+// 清空可选字段（传入 null）
+final userWithoutTags = user.copyWith(tags: null);
+```
+
+**不同类型字段的 copyWith 处理：**
+
+```dart
+class ComplexModel {
+  final String title;
+  final List<String>? items;
+  final Map<String, dynamic>? metadata;
+  final CustomObject? customObj;
+
+  // copyWith 需要正确处理不同类型
+  ComplexModel copyWith({
+    String? title,
+    List<String>? items,          // 可选列表
+    Map<String, dynamic>? metadata, // 可选 Map
+    CustomObject? customObj,       // 可选自定义对象
+  }) {
+    return ComplexModel(
+      title: title ?? this.title,
+      items: items ?? this.items,
+      metadata: metadata ?? this.metadata,
+      customObj: customObj ?? this.customObj,
+    );
+  }
+}
+```
+
+**特殊场景的处理：**
+
+```dart
+// 1. 需要明确区分 null 和不更新的场景
+class AdvancedModel {
+  final String? optionalField;
+
+  // 使用包装类来区分 null 和不更新
+  AdvancedModel copyWith({
+    String? optionalField,
+    bool updateOptionalField = false,
+  }) {
+    return AdvancedModel(
+      optionalField: updateOptionalField ? optionalField : this.optionalField,
+    );
+  }
+}
+
+// 2. 使用freezed包可以自动生成这些方法
+@freezed
+class AutoGeneratedModel with _$AutoGeneratedModel {
+  const factory AutoGeneratedModel({
+    required String name,
+    required int age,
+    bool? isActive,
+  }) = _AutoGeneratedModel;
+
+  factory AutoGeneratedModel.fromJson(Map<String, dynamic> json) =>
+      _$AutoGeneratedModelFromJson(json);
+}
+```
+
+## 最佳实践
+
+### 1. 模型类设计
+
+```dart
+class ApiResponse {
+  final int code;        // 非空类型（遵循规则3）
+  final String message;  // 非空类型（遵循规则3）
+  final Data? data;      // 复杂类型可空（可能为null）
+
+  const ApiResponse({
+    required this.code,
+    required this.message,
+    this.data,
+  });
+
+  // 必须方法：fromJson（遵循规则6）
+  factory ApiResponse.fromJson(Map<String, dynamic> json) {
+    return ApiResponse(
+      // 基础类型自动获得默认值（遵循规则3）
+      code: json.asInt('code'),           // 自动默认为 0
+      message: json.asString('message'),  // 自动默认为 ''
+      // 使用构造函数引用（遵循规则4）
+      data: json.asBean<Data>('data', Data.fromJson),
+    );
+  }
+
+  // 必须方法：toJson（遵循规则6）
+  // 转换为 JSON 时使用条件语法（遵循规则2）
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+      'message': message,
+      if (data != null) 'data': data!.toJson(),
+    };
+  }
+
+  // 必须方法：copyWith（遵循规则6）
+  ApiResponse copyWith({
+    int? code,
+    String? message,
+    Data? data,
+  }) {
+    return ApiResponse(
+      code: code ?? this.code,
+      message: message ?? this.message,
+      data: data ?? this.data,
+    );
+  }
+}
+```
+
+### 2. 错误监控
+
+```dart
+void setupJsonErrorMonitoring() {
+  Json2Dart.instance.addDetailCallback((method, key, map) {
+    // 使用条件语法构建错误报告（遵循规则2）
+    final errorReport = {
+      'method': method,
+      'key': key,
+      if (map != null) 'data': map.toString(),
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+
+    // 发送错误报告到监控系统
+    ErrorReporter.report('JSON解析错误', errorReport);
+  });
+}
+```
+
+### 3. 兼容性处理
+
+```dart
+// 处理不同版本 API 的字段变化
+class User {
+  final String name;     // 基础类型使用非空（遵循规则3）
+  final UserProfile? profile;  // 复杂类型可空
+
+  const User({required this.name, this.profile});
+
+  // 必须方法：fromJson（遵循规则6）
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      // 标准场景：使用单字段解析（遵循规则5）
+      name: json.asString('name'),
+      // 使用构造函数引用（遵循规则4）
+      profile: json.asBean<UserProfile>('profile', UserProfile.fromJson),
+    );
+  }
+
+  // 必须方法：toJson（遵循规则6）
+  // 转换为 JSON 时使用条件语法（遵循规则2）
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,  // 基础类型直接添加，不需要判空
+      if (profile != null) 'profile': profile!.toJson(),
+      'timestamp': DateTime.now().toIso8601String(),
+    };
+  }
+
+  // 必须方法：copyWith（遵循规则6）
+  User copyWith({String? name, UserProfile? profile}) {
+    return User(
+      name: name ?? this.name,
+      profile: profile ?? this.profile,
+    );
+  }
+}
+
+// 用户明确要求多字段解析的场景（遵循规则5）
+class UserWithMultiFieldParsing {
+  final String name;
+
+  const UserWithMultiFieldParsing({required this.name});
+
+  // 必须方法：fromJson（遵循规则6）
+  factory UserWithMultiFieldParsing.fromJson(Map<String, dynamic> json) {
+    return UserWithMultiFieldParsing(
+      // 用户明确说："尝试从username、name、displayName字段中获取用户名"
+      name: json.asStrings(['username', 'name', 'displayName']),
+    );
+  }
+
+  // 必须方法：toJson（遵循规则6）
+  Map<String, dynamic> toJson() {
+    return {'name': name};
+  }
+
+  // 必须方法：copyWith（遵循规则6）
+  UserWithMultiFieldParsing copyWith({String? name}) {
+    return UserWithMultiFieldParsing(name: name ?? this.name);
+  }
+}
+
+// 用户明确要求自定义默认值的场景（遵循规则1）
+class UserWithCustomDefault {
+  final String name;
+
+  const UserWithCustomDefault({required this.name});
+
+  // 必须方法：fromJson（遵循规则6）
+  factory UserWithCustomDefault.fromJson(Map<String, dynamic> json) {
+    return UserWithCustomDefault(
+      // 用户明确要求：如果找不到用户名，使用'匿名用户'
+      name: json.asString('name', '匿名用户'),
+    );
+  }
+
+  // 必须方法：toJson（遵循规则6）
+  Map<String, dynamic> toJson() {
+    return {'name': name};
+  }
+
+  // 必须方法：copyWith（遵循规则6）
+  UserWithCustomDefault copyWith({String? name}) {
+    return UserWithCustomDefault(name: name ?? this.name);
+  }
+}
+```
+
+## 性能考虑
+
+1. **类型检查优化**: 优先检查目标类型，减少不必要的转换
+2. **缓存机制**: 对于复杂的嵌套解析，考虑添加缓存层
+3. **批量操作**: 使用多字段解析方法减少重复遍历
+
+## 常见问题
+
+### Q: 如何处理深度嵌套的 JSON？
+A: 逐层使用 `asBean` 方法，为每个层级创建对应的模型类，确保每个模型类都包含 fromJson、toJson 和 copyWith 方法。
+
+### Q: 大量数据解析性能如何优化？
+A: 考虑使用 `asLists` 的批量解析功能，避免单个元素逐一解析。
+
+### Q: 如何调试解析错误？
+A: 启用详细错误回调，记录解析失败的具体位置和原因。
+
+### Q: 为什么必须要有 fromJson、toJson 和 copyWith 方法？
+A:
+- **fromJson**: 确保能从JSON数据创建Dart对象，支持API数据反序列化
+- **toJson**: 确保能将Dart对象转换为JSON，支持数据持久化和网络传输
+- **copyWith**: 支持不可变对象的属性更新，符合Flutter最佳实践
+
+### Q: copyWith 方法如何处理可选字段的 null 值？
+A: 使用 `??` 操作符保持原值，如果需要明确设置为 null，可以使用包装类或额外的布尔参数来区分。
+
+### Q: 是否可以使用代码生成工具来自动生成这些方法？
+A: 是的，推荐使用 `freezed`、`json_annotation` 等包来自动生成这些样板代码，提高开发效率。
+
+## 自动代码生成建议
+
+为了提高开发效率，建议使用代码生成工具来自动生成 fromJson、toJson 和 copyWith 方法：
+
+### 使用 freezed 包（推荐）
+
+```yaml
+# pubspec.yaml
+dependencies:
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+
+dev_dependencies:
+  build_runner: ^2.4.7
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
+```
+
+```dart
+// user.dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'user.freezed.dart';
+part 'user.g.dart';
+
+@freezed
+class User with _$User {
+  const factory User({
+    required String name,
+    required int age,
+    required bool isActive,
+    UserProfile? profile,
+    List<String>? tags,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+```
+
+生成命令：
+```bash
+dart run build_runner build
+```
+
+### 使用 json_serializable 包
+
+```dart
+import 'package:json_annotation/json_annotation.dart';
+
+part 'user.g.dart';
+
+@JsonSerializable()
+class User {
+  final String name;
+  final int age;
+  final bool isActive;
+
+  const User({required this.name, required this.age, required this.isActive});
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  // 仍需手动实现 copyWith
+  User copyWith({String? name, int? age, bool? isActive}) {
+    return User(
+      name: name ?? this.name,
+      age: age ?? this.age,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+}
+```
+
+### 手动实现 vs 自动生成对比
+
+| 特性 | 手动实现 | freezed | json_serializable |
+|------|----------|---------|-------------------|
+| fromJson | ✅ 完全控制 | ✅ 自动生成 | ✅ 自动生成 |
+| toJson | ✅ 完全控制 | ✅ 自动生成 | ✅ 自动生成 |
+| copyWith | ✅ 完全控制 | ✅ 自动生成 | ❌ 需手动实现 |
+| 不可变性 | ✅ 手动保证 | ✅ 自动保证 | ✅ 手动保证 |
+| equals/hashCode | ❌ 需手动实现 | ✅ 自动生成 | ❌ 需手动实现 |
+| toString | ❌ 需手动实现 | ✅ 自动生成 | ❌ 需手动实现 |
+
+**推荐策略**：
+- **简单模型**：手动实现，完全控制
+- **复杂模型**：使用 freezed，减少样板代码
+- **现有项目**：使用 json_serializable 逐步迁移
+
+## 版本更新
+
+当前版本 1.6.0 的主要特性：
+- 完整的空安全支持
+- 优化的错误处理机制
+- 增强的多字段解析功能
+- 二维数组解析支持

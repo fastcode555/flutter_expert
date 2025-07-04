@@ -37,6 +37,7 @@ dependencies:
   get: ^4.6.5
   flutter_tailwind: ^1.6.1
   flutter_screenutil: ^5.9.3
+  json2dart_safe: ^1.6.0
 
 dev_dependencies:
   flutter_test:
