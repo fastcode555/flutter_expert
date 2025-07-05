@@ -171,6 +171,8 @@ alwaysApply: true
 - 需要执行 'fvm dart analyze' 分析报错问题，然后再执行 'fvm dart fix --apply'修复问题
 - 需要检查代码是否遵循了 flutter_tailwind，如果不遵循，需要进行重构，再次验证
 - 最后再执行'fvm flutter run'来执行代码，跑起来，验证代码是否会出现overflow的越界问题，还有其它报错，需要修复报错，直到没有问题为止
+- 开启 MCP test-runner 扩展，让生成后自动跑测试并回传错误；
+- 禁止生成无用示例代码”指令
 ---
 
 如有疑问或建议，请联系项目维护者。
